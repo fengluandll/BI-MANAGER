@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhisiyun.bi.defaultDao.RsReportMapper">
+	<resultMap id="BaseResultMap" type="com.zhisiyun.bi.bean.defaultBean.RsReport">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="report_id" jdbcType="VARCHAR" property="report_id" />
+		<result column="page_id" jdbcType="VARCHAR" property="page_id" />
+		<result column="params" jdbcType="VARCHAR" property="params" />
+		<result column="create_date" jdbcType="DATE" property="create_date" />
+		<result column="modify_date" jdbcType="DATE" property="modify_date" />
+	</resultMap>
+
+	<insert id="add">
+		insert into rs_report
+		(report_id,page_id,params)
+		values(#{reportId},#{pageId},#{params})
+	</insert>
+
+	<select id="selectByReportId" resultMap="BaseResultMap">
+		select * from rs_report where
+		report_id
+		= #{reportId}
+	</select>
+	
+	<select id="selectByPageId" resultMap="BaseResultMap">
+		select * from rs_report where
+		page_id
+		= #{pageId}
+	</select>
+
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhisiyun.bi.defaultDao.RsTableConfMapper">
+	<resultMap id="BaseResultMap" type="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<id column="ds_id" jdbcType="INTEGER" property="ds_id" />
+		<result column="ds_name" jdbcType="VARCHAR" property="ds_name" />
+		<result column="ds_display" jdbcType="VARCHAR" property="ds_display" />
+		<result column="create_date" jdbcType="DATE" property="create_date" />
+		<result column="modify_date" jdbcType="DATE" property="modify_date" />
+	</resultMap>
+
+	<select id="selectAll" resultMap="BaseResultMap">
+		select * from rs_table_conf
+		order by
+		id
+	</select>
+
+	<select id="selectByName" resultMap="BaseResultMap">
+		select * from rs_table_conf
+		where ds_name = #{ds_name}
+		order by
+		id
+	</select>
+
+	<select id="selectById" resultMap="BaseResultMap">
+		select * from rs_table_conf
+		where id = #{id}
+		order by
+		id
+	</select>
+</mapper>

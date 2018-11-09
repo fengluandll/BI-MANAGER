@@ -19,4 +19,6 @@ public interface RsColumnConfMapper {
 
 	List<RsColumnConf> selectByIds(@Param("ids") List<Integer> ids);
 
+	int addByBean(RsColumnConf rsColumnConf);
+
 }

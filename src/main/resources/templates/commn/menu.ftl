@@ -2,6 +2,14 @@
 <aside class="Hui-aside">
 	<div class="menu_dropdown bk_2">
 		<dl id="menu-article">
+			<dt><i class="Hui-iconfont">&#xe616;</i> 数据集<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+			<dd>
+				<ul>
+				    <li><a href="${request.contextPath}/dataSet/list" title="数据集列表">数据集列表</a></li>
+				</ul>
+			</dd>
+		</dl>
+		<dl id="menu-article">
 			<dt><i class="Hui-iconfont">&#xe616;</i> 图表编辑<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
 			<dd>
 				<ul>

@@ -55,4 +55,11 @@
 		</foreach>
 		order by id
 	</select>
+
+	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsColumnConf">
+		insert into
+		rs_column_conf
+		(rs_t_id,rsc_display,rsc_name,rsc_type,rsc_formatter,rsc_remark,rsc_category)
+		values(#{rs_t_id},#{rsc_display},#{rsc_name},#{rsc_type},#{rsc_formatter},#{rsc_remark},#{rsc_category})
+	</insert>
 </mapper>

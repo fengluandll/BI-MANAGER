@@ -13,5 +13,7 @@ public interface RsTableConfMapper {
 	List<RsTableConf> selectByName(@Param("ds_name") String ds_name);
 
 	RsTableConf selectById(@Param("id") Integer id);
+	
+	List<RsTableConf> selectByNameOrDisplay(@Param("ds_name") String ds_name);
 
 }

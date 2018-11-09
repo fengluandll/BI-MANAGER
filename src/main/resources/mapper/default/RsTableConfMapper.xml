@@ -29,4 +29,14 @@
 		order by
 		id
 	</select>
+
+	<select id="selectByNameOrDisplay" resultMap="BaseResultMap">
+		select * from
+		rs_table_conf
+		where ds_name like CONCAT('%',#{ds_name},'%')
+		or
+		ds_display like CONCAT('%',#{ds_name},'%')
+		order by
+		id
+	</select>
 </mapper>

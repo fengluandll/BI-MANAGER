@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.zhisiyun.bi.dsDao.rsReportMapper" >
+<mapper namespace="com.zhisiyun.bi.dsDao.DirctDrMapper">
+	<resultMap id="BaseResultMap" type="com.zhisiyun.bi.bean.ds.DirctDr">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="code_dr" jdbcType="VARCHAR" property="code_dr" />
+		<result column="name_dr" jdbcType="VARCHAR" property="name_dr" />
+		<result column="type" jdbcType="VARCHAR" property="type" />
+	</resultMap>
+
+	<select id="selectAll" resultMap="BaseResultMap">
+		select * from dirct_dr order by
+		id
+	</select>
+
+	<select id="selectByCode" resultMap="BaseResultMap">
+		select * from dirct_dr where
+		code_dr = #{code}
+	</select>
 
 </mapper>

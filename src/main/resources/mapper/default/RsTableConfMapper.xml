@@ -39,4 +39,20 @@
 		order by
 		id
 	</select>
+	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
+		insert into
+		rs_table_conf(ds_id,ds_name,ds_display)
+		values(#{ds_id},#{ds_name},#{ds_display})
+	</insert>
+	<update id="updateByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
+		update rs_table_conf
+		<set>
+			ds_id = #{ds_id},
+			ds_name
+			= #{ds_name},
+			ds_display = #{ds_display}
+		</set>
+		where id =
+		#{id}
+	</update>
 </mapper>

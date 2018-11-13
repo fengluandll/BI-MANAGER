@@ -42,17 +42,16 @@ public class DashBoardController {
 	}
 
 	/**
-	 * @see dashboard保存
+	 * @see 跳转dashboard 编辑dateset字段关联页面
 	 * @author wangliu
-	 * @serialData 20181019
+	 * @serialData 20181113
 	 **/
-//	@RequestMapping("/saveDashboard")
-//	public ModelAndView saveDashboard(String name) throws Exception {
-//		ModelAndView view = new ModelAndView();
-//		mDashboardMapper.add(name);
-//		view.setViewName("dashboard/dashboardList");
-//		return view;
-//	}
+	@RequestMapping("/editDataSet")
+	public ModelAndView editDataSet(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		ModelAndView view = new ModelAndView();
+		view.setViewName("dashboard/dashboard_dataSet");
+		return view;
+	}
 
 	/******************************** 下面是chart ************************/
 

@@ -33,7 +33,7 @@ $(function(){
 function save(){
   var name = $("#name").val();
   $.ajax({
-		url:"${request.contextPath}/api/edit/saveDashboard",
+		url:"${request.contextPath}/api/mDashboard/saveDashboard",
 		type:"post",
 		async:false,
 		data:{"name":name},

@@ -58,7 +58,7 @@
 $(function(){
 		var oTable = $('#listTable').dataTable({
 			"ajax": {
-				url: '${request.contextPath}/api/edit/getMDashboardList',
+				url: '${request.contextPath}/api/mDashboard/getMDashboardList',
 				type:"post",
 				async: true,
 				data: {
@@ -93,7 +93,7 @@ $(function(){
 					"render": function(data, type, row, meta) {
 						var opt = "";
 						//操作选项
-						opt = "<a title=\"编辑\" href=\"javascript:void(0);\"  onclick=\"addDashboard();\"" + " id=\"btnEdit\" class=\"ml-5\" style=\"text-decoration:none\"><i class=\"Hui-iconfont\">&#xe6df;</i></a>";
+						opt = "<a title=\"数据集对应关系\" href=\"javascript:void(0);\"  onclick=\"addDashboard('"+data.id+"');\"" + " id=\"btnEdit\" class=\"ml-5\" style=\"text-decoration:none\"><i class=\"Hui-iconfont\">&#xe60c;</i></a>";
 						opt = opt +"<a title=\"删除\" href=\"javascript:void(0);\" onclick=\"boardDelete('"+data.id+"');\"" + " id=\"btnAppy\" class=\"ml-5\" style=\"text-decoration:none\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
 						return opt;
 					}
@@ -140,6 +140,11 @@ function addDashboard(){
 //  删除
 function boardDelete(){
   alert("暂时不能删除");
+}
+
+// 编辑数据集合数据集字段的关联关系
+function editDataSet(id){
+	window.location.href = "${request.contextPath}/dashboard/editDataSet?id=" + id + "";
 }
 
 </script>

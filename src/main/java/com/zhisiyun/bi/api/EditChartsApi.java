@@ -19,12 +19,10 @@ import com.zhisiyun.bi.bean.db.DbParameters;
 import com.zhisiyun.bi.bean.db.JTableParam;
 import com.zhisiyun.bi.bean.db.JTableResult;
 import com.zhisiyun.bi.bean.defaultBean.Mcharts;
-import com.zhisiyun.bi.bean.defaultBean.Mdashboard;
 import com.zhisiyun.bi.bean.defaultBean.RsColumnConf;
 import com.zhisiyun.bi.bean.defaultBean.RsTableConf;
 import com.zhisiyun.bi.defaultDao.JdbcDao;
 import com.zhisiyun.bi.defaultDao.MchartsMapper;
-import com.zhisiyun.bi.defaultDao.MdashboardMapper;
 import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.utils.SqlUtils;
@@ -41,9 +39,6 @@ public class EditChartsApi {
 
 	@Autowired
 	private RsTableConfMapper rsTableConfMapper;
-
-	@Autowired
-	private MdashboardMapper mdashboardMapper;
 
 	@Autowired
 	private JdbcDao jdbcDao;
@@ -242,73 +237,6 @@ public class EditChartsApi {
 		return map;
 	}
 
-	/******************* 报表列表 *****************************/
-	/**
-	 * 查出所有的m_dashboard 列表
-	 * 
-	 * @param boardName:dashboard名称
-	 * 
-	 * @date 20181019
-	 * @return
-	 */
-	@RequestMapping(value = "/getMDashboardList", method = RequestMethod.POST)
-	public JTableResult getMDashboardList(String boardName, JTableParam jTableParam) {
-		DbParameters<String> dbParameters = new DbParameters<String>();
-		JTableResult jTableResult = new JTableResult();
-		dbParameters.addParam("roleName", boardName);
-		dbParameters.setPageSize(jTableParam.getLength());
-		dbParameters.setOffset(jTableParam.getStart());
-		dbParameters.setPaging(true);
-		try {
-			List<Mdashboard> mdashboardList = null;
-			if (null != boardName && !"".equals(boardName)) {
-				mdashboardList = mdashboardMapper.selectByName(boardName);
-			} else {
-				mdashboardList = mdashboardMapper.selectAll();
-			}
-			jTableResult.setDraw(jTableParam.getDraw());
-			jTableResult.setRecordsTotal(dbParameters.getTotalRecord());
-			jTableResult.setRecordsFiltered(dbParameters.getTotalRecord());
-			jTableResult.setData(mdashboardList);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return jTableResult;
-	}
-
-	/**
-	 * @see dashboard保存
-	 * @author wangliu
-	 * @serialData 20181019
-	 **/
-	@RequestMapping(value = "/saveDashboard", method = RequestMethod.POST)
-	public void saveDashboard(String name) throws Exception {
-		try {
-			Mdashboard mdashboard = new Mdashboard();
-			mdashboard.setName(name);
-			// 创建一个mdashboard
-			mdashboardMapper.addByBean(mdashboard);
-			// 根据boardid 创建一个 chart
-			Mcharts mcharts = new Mcharts();
-			Integer boardId = mdashboard.getId();
-			String chartName = "搜索框" + boardId;
-			String config = "{\"name\":\"\",\"type\":\"11\",\"dataSetName\":\"\",\"dataSearch\":\"\",\"searchItem\":\"\",\"padding\":\"\",\"searchJson\":{}}";
-			mcharts.setDashboard_id(boardId);
-			mcharts.setName(chartName);
-			mcharts.setConfig(config);
-			mChartsMapper.newChartByBean(mcharts);
-			// 跟新mdashboard中的style_config
-			Integer chartId = mcharts.getId();
-			String style_config = "{\"name\":\"\",\"type\":\"root\",\"children\":[{\"name\":\"" + chartId
-					+ "\",\"type\":\"search\",\"chartId\":\"" + chartId
-					+ "\",\"fatherName\":\"root\",\"styleConfig\":\"\",\"relation\":{}}],\"dragactStyle\":[{\"GridX\":0,\"GridY\":0,\"w\":39,\"h\":2,\"key\":\""
-					+ chartId + "\",\"type\":\"search\"}]}";
-			mdashboardMapper.updateById(boardId, style_config);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	/************ react 请求 ************/
 
 	/**
@@ -371,7 +299,7 @@ public class EditChartsApi {
 			SqlUtils sqlUtils = new SqlUtils();
 			Map map = new HashMap();
 			String sql = sqlUtils.assemble(dataSetName, dimensionObj, measureObj, legendObj, jsonObj, map);
-			System.out.println("编辑chart sql: "+sql);
+			System.out.println("编辑chart sql: " + sql);
 			list = jdbcDao.query(sql, map);
 			if (list.size() > 10) {
 				list = list.subList(0, 10);
@@ -421,7 +349,7 @@ public class EditChartsApi {
 			SqlUtils sqlUtils = new SqlUtils();
 			Map map = new HashMap();
 			String sql = sqlUtils.assemble(dataSetName, rsColumnConfList, map, headers);
-			System.out.println("编辑table sql: "+sql);
+			System.out.println("编辑table sql: " + sql);
 			list = jdbcDao.query(sql, map);
 
 			List row;

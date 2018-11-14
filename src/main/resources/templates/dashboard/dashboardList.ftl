@@ -93,7 +93,7 @@ $(function(){
 					"render": function(data, type, row, meta) {
 						var opt = "";
 						//操作选项
-						opt = "<a title=\"数据集对应关系\" href=\"javascript:void(0);\"  onclick=\"addDashboard('"+data.id+"');\"" + " id=\"btnEdit\" class=\"ml-5\" style=\"text-decoration:none\"><i class=\"Hui-iconfont\">&#xe60c;</i></a>";
+						opt = "<a title=\"数据集对应关系\" href=\"javascript:void(0);\"  onclick=\"editDataSet('"+data.id+"');\"" + " id=\"btnEdit\" class=\"ml-5\" style=\"text-decoration:none\"><i class=\"Hui-iconfont\">&#xe60c;</i></a>";
 						opt = opt +"<a title=\"删除\" href=\"javascript:void(0);\" onclick=\"boardDelete('"+data.id+"');\"" + " id=\"btnAppy\" class=\"ml-5\" style=\"text-decoration:none\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
 						return opt;
 					}

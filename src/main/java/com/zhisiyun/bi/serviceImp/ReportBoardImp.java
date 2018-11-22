@@ -492,9 +492,15 @@ public class ReportBoardImp {
 			// 字符串
 			case "2":
 				if (props != null && props.length > 0) {
-					String propTmp = StringUtils.join(props, ",");
-					if (propTmp != null && !propTmp.equals(""))
-						builder.append(" and " + itemBean.getRsc_name() + " in ( '" + propTmp + "' ) ");
+					// 字符串参数 数组形式转换成 一个字符串
+					String propTmp = "";
+					for (int i = 0; i < props.length; i++) {
+						propTmp = propTmp + "'" + props[i] + "',";
+					}
+					propTmp = propTmp.substring(0, propTmp.length() - 1);
+					if (propTmp != null && !propTmp.equals("")) {
+						builder.append(" and " + itemBean.getRsc_name() + " in ( " + propTmp + " ) ");
+					}
 				}
 				break;
 			// 日期

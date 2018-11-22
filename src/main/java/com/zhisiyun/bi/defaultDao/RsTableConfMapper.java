@@ -24,4 +24,6 @@ public interface RsTableConfMapper {
 
 	List<RsTableConf> selectByIdList(@Param("idList") List<Integer> idList);
 
+	int makeTableAndColumn(@Param("id") Integer id);
+
 }

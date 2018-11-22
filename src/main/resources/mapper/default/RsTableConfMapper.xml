@@ -46,7 +46,8 @@
 		rs_table_conf(ds_id,ds_name,ds_display)
 		values(#{ds_id},#{ds_name},#{ds_display})
 	</insert>
-	<insert id="addDiyByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
+	<insert id="addDiyByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf"
+		useGeneratedKeys="true" keyProperty="id">
 		insert into
 		rs_table_conf(ds_name,ds_display,ds_type,logic)
 		values(#{ds_name},#{ds_display},#{ds_type},#{logic})
@@ -72,5 +73,12 @@
 		</foreach>
 		order by
 		id
+	</select>
+	<select id="makeTableAndColumn" useCache="false" statementType="CALLABLE"
+		resultType="java.lang.Integer">  
+        <![CDATA[ 
+        select fnc_stru_analyse(
+        #{id,mode=IN,jdbcType=INTEGER});
+        ]]>
 	</select>
 </mapper>

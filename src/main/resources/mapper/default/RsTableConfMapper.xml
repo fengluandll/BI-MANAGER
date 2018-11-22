@@ -6,6 +6,8 @@
 		<id column="ds_id" jdbcType="INTEGER" property="ds_id" />
 		<result column="ds_name" jdbcType="VARCHAR" property="ds_name" />
 		<result column="ds_display" jdbcType="VARCHAR" property="ds_display" />
+		<result column="ds_type" jdbcType="INTEGER" property="ds_type" />
+		<result column="logic" jdbcType="VARCHAR" property="logic" />
 		<result column="create_date" jdbcType="DATE" property="create_date" />
 		<result column="modify_date" jdbcType="DATE" property="modify_date" />
 	</resultMap>
@@ -44,6 +46,11 @@
 		rs_table_conf(ds_id,ds_name,ds_display)
 		values(#{ds_id},#{ds_name},#{ds_display})
 	</insert>
+	<insert id="addDiyByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
+		insert into
+		rs_table_conf(ds_name,ds_display,ds_type,logic)
+		values(#{ds_name},#{ds_display},#{ds_type},#{logic})
+	</insert>
 	<update id="updateByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
 		update rs_table_conf
 		<set>
@@ -55,4 +62,15 @@
 		where id =
 		#{id}
 	</update>
+	<select id="selectByIdList" resultMap="BaseResultMap">
+		select * from
+		rs_table_conf
+		where id in
+		<foreach collection="idList" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		order by
+		id
+	</select>
 </mapper>

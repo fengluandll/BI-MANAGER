@@ -352,7 +352,8 @@ public class ReportBoardImp {
 			StringBuilder builder = new StringBuilder("select ");
 			List<String> cols = new ArrayList<>();
 			for (RsColumnConf rs : rsColumnConfList) {
-				if (rs.getIs_calc().equals("N") && rs.getRsc_category().equals("2")) {
+				// is_calc rsc_category 1维度 2度量
+				if (rs.getIs_calc().equals("N") && rs.getRsc_category().equals(2)) {
 					cols.add(" sum(" + rs.getRsc_name() + ") as " + rs.getRsc_display());
 				} else {
 					cols.add(rs.getRsc_name() + " as " + rs.getRsc_display());
@@ -391,10 +392,14 @@ public class ReportBoardImp {
 
 			// group by
 			if (rsColumnConfList != null && rsColumnConfList.size() > 0) {
-				builder.append(" group by ");
 				List<String> groupBy = new ArrayList<>();
 				for (RsColumnConf col : rsColumnConfList) {
-					groupBy.add(col.getRsc_name());
+					if (col.getRsc_category().equals(1)) {// 只有维度可以group by 20181122
+						groupBy.add(col.getRsc_name());
+					}
+				}
+				if (groupBy.size() > 0) {
+					builder.append(" group by ");
 				}
 				builder.append(StringUtils.join(groupBy, " , "));
 			}

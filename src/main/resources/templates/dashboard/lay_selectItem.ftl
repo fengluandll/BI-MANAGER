@@ -15,10 +15,10 @@
 	<thead>
 		<tr>
 		    <td>ID</td>
-			<td>类型</td>
+			<td>维度、度量类型</td>
 			<td>名称</td>
 			<td>字段名</td>
-			<td>类型</td>
+			<td>数字、字符、时间类型</td>
 		</tr>
 	</thead>
 	<tbody>
@@ -42,6 +42,8 @@ $(function(){
 function saveColumn(){
 	var index = parent.layer.getFrameIndex(window.name);
 	parent.$("#searchItem").val($("#searchItem").val());
+	// 调用保存并刷新
+	parent.save();
 	parent.layer.close(index);
 
 }

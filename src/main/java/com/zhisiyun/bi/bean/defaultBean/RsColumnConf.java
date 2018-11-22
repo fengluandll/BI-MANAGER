@@ -9,29 +9,31 @@ public class RsColumnConf implements Serializable {
 	 */
 	private static final long serialVersionUID = 8806299147987958826L;
 
-	private Integer id;
+	private Integer id; // 字段column id
 
-	private Integer rs_t_id;
+	private Integer rs_t_id; // table id
 
-	private String is_calc;
+	private String is_calc; // 是否计算字段
 
-	private Integer rsc_category;
+	private Integer rsc_category; // 种类 维度 和 度量
 
-	private String rsc_display;
+	private String rsc_display; // 展示名称
 
-	private String rsc_formatter;
+	private String rsc_formatter; // 格式化
 
-	private String rsc_name;
+	private String rsc_name; // 字段
 
-	private Integer rsc_type;
+	private Integer rsc_type; // 字段类型 1数字 2字符 3时间
 
-	private Integer rsc_sort;
+	private Integer rsc_sort; // 排序
 
-	private String rsc_remark;
+	private String rsc_remark; // 备注
 
-	private Integer rsc_conversion;
+	private Integer rsc_conversion; // ???
 
-	private String rsc_order;
+	private String rsc_order; // 排序
+
+	private String bl_active; // 自定义数据集字段 是否可用 Y可用 N删除
 
 	public Integer getId() {
 		return id;
@@ -127,6 +129,14 @@ public class RsColumnConf implements Serializable {
 
 	public void setRsc_order(String rsc_order) {
 		this.rsc_order = rsc_order;
+	}
+
+	public String getBl_active() {
+		return bl_active;
+	}
+
+	public void setBl_active(String bl_active) {
+		this.bl_active = bl_active;
 	}
 
 }

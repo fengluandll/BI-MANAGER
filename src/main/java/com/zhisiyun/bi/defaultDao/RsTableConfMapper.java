@@ -18,6 +18,10 @@ public interface RsTableConfMapper {
 
 	int addByBean(RsTableConf rsTableConf);
 
+	int addDiyByBean(RsTableConf rsTableConf);
+
 	int updateByBean(RsTableConf rsTableConf);
+
+	List<RsTableConf> selectByIdList(@Param("idList") List<Integer> idList);
 
 }

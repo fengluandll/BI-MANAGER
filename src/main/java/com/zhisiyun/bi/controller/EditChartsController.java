@@ -1,14 +1,17 @@
 package com.zhisiyun.bi.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhisiyun.bi.bean.defaultBean.Mcharts;
 import com.zhisiyun.bi.bean.defaultBean.Mdashboard;
@@ -34,6 +37,9 @@ public class EditChartsController {
 
 	@Autowired
 	private RsColumnConfMapper rsColumnConfMapper;
+	
+	@Value("${edit.url}")
+	private String EDIT_URL;
 
 	/**
 	 * @see 编辑图表控件页面
@@ -53,8 +59,15 @@ public class EditChartsController {
 			mCharts = mChartsMapper.selectOne(Integer.parseInt(id), Integer.parseInt(dashboardId));
 			// dashboard
 			mdashboard = mDashboardMapper.selectById(Integer.parseInt(dashboardId));
-			// 查询 数据集
-			rsTableConfList = rsTableConfMapper.selectAll();
+			// 查询 数据集(根据dashboard中配置的查询)
+			String style_config_str = mdashboard.getStyle_config();
+			JSONObject obj = JSON.parseObject(style_config_str);
+			JSONArray dataSet = obj.getJSONArray("dataSet");
+			List<Integer> idList = new ArrayList<Integer>(); // rs_table_config 的 id list
+			for (int i = 0; i < dataSet.size(); i++) {
+				idList.add(dataSet.getInteger(i));
+			}
+			rsTableConfList = rsTableConfMapper.selectByIdList(idList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -65,6 +78,7 @@ public class EditChartsController {
 		model.addAttribute("rsTableConfList", rsTableConfList);
 		model.addAttribute("mCharts", mCharts);
 		model.addAttribute("mdashboard", mdashboard);
+		model.addAttribute("edit_url", EDIT_URL);
 
 		// 根据 type 来跳转 需要的 页面
 		// 0 1 2 3 图表 4 table 5 search
@@ -133,7 +147,7 @@ public class EditChartsController {
 		}
 		return view;
 	}
-	
+
 	/**
 	 * @see 编辑暴露字段
 	 * @author wangliu
@@ -157,7 +171,7 @@ public class EditChartsController {
 		}
 		return view;
 	}
-	
+
 	/**
 	 * @see 增加搜索框的item
 	 * @author wangliu

@@ -54,7 +54,7 @@ public class SqlUtils {
 		}
 		builder.append(" y from ");
 		builder.append(table);
-		//mergeSqlParams(builder, params, map);
+		// mergeSqlParams(builder, params, map);
 		// 按图例-维度分组
 		builder.append(" group by ");
 		if (legend != null) {
@@ -86,7 +86,7 @@ public class SqlUtils {
 		StringBuilder builder = new StringBuilder("select ");
 		List<String> cols = new ArrayList<>();
 		for (RsColumnConf rs : list) {
-			if (rs.getIs_calc().equals("N") && rs.getRsc_category().equals("2")) {
+			if (rs.getIs_calc().equals("N") && rs.getRsc_category().equals(2)) {
 				cols.add(" sum(" + rs.getRsc_name() + ") as " + rs.getRsc_display());
 			} else {
 				cols.add(rs.getRsc_name() + " as " + rs.getRsc_display());
@@ -96,6 +96,18 @@ public class SqlUtils {
 		builder.append(StringUtils.join(cols.toArray(), ","));
 		builder.append(" from ");
 		builder.append(table);
+
+		// 拼接group by
+		List<String> groupBy = new ArrayList<>();
+		for (RsColumnConf rs : list) {
+			if (rs.getRsc_category().equals(1)) {// 只有维度可以group by 20181122
+				groupBy.add(rs.getRsc_name());
+			}
+		}
+		if (groupBy.size() > 0) {
+			builder.append(" group by ");
+		}
+		builder.append(StringUtils.join(groupBy, " , "));
 		builder.append(" limit 10 ");
 		return builder.toString();
 	}

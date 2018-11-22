@@ -99,7 +99,7 @@ public class DashBoardController {
 					String display = rsColumnConf.getRsc_display();
 					RsTableConf table = rsTableConfMapper.selectById(rs_t_id);
 					String ds_display = table.getDs_display();
-					columnsContent = columnsContent + ds_display + " : " + display + " ;  ";
+					columnsContent = columnsContent + ds_display + " : " + display + " ; " + " - - ";
 				}
 				relationStrList.add(columnsContent);
 			}

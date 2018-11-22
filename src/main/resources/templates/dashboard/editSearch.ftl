@@ -13,7 +13,7 @@
 	
 	<!--iframe显示框-->
 	<div class="boxLeft">
-		<iframe id="iframe" src="" width="100%" height="100%" margin="5px;"></iframe>
+		<div style="margin-top:20px;">搜索框没有图形显示</div>
 	</div>
 	
 	<!--右侧组件list显示框-->
@@ -205,7 +205,7 @@ var searchJson = {};  // 全局对象  search 的 searchJson；
 $(function(){
 	//   显示图表
     var chartId = ${mCharts.id!}; 
-    //$("#iframe").attr("src","http://localhost:8000/smart_report/editCharts/" + chartId);
+    //$("#iframe").attr("src","${edit_url}" + chartId);
     
     // 填充数据
     var config = ${mCharts.config!};
@@ -333,6 +333,8 @@ function saveTag(){
 		obj.time_to = time_to;
 		searchJson[id] = obj;
 	}
+	// 调用最外层的保存
+	this.save();
 }
 
 // 跳转 其他组件
@@ -367,14 +369,14 @@ function save(){
 		async:false,
 		data:{"id":"${mCharts.id!}","config":param},
 		success:function(data){
-		  alert("保存成功");
-		  alert(param);
+		  
 		},
 		error:function(data){
 		  alert("保存失败");
 		}
 	});
-	
+	// 刷新页面
+	window.location.reload();
 }
 
 // 选择图表的暴露字段
@@ -406,7 +408,7 @@ function addItem(){
 }
 
 
-
+//  新建chart
 function newChart(type){
 	var config = {};
 	var name = "";
@@ -442,6 +444,8 @@ function newChart(type){
 		  alert("新建失败");
 		}
 	});
+	// 刷新页面
+	window.location.reload();
 }
 
 </script>

@@ -203,7 +203,7 @@
 $(function(){
 	//   显示图表
     var chartId = ${mCharts.id!}; 
-    $("#iframe").attr("src","http://localhost:8000/smart_report/editCharts/" + chartId);
+    $("#iframe").attr("src","${edit_url}" + chartId);
     
     // 填充数据
     var config = ${mCharts.config!};
@@ -309,12 +309,13 @@ function save(){
 		data:{"id":"${mCharts.id!}","config":param},
 		success:function(data){
 		  alert("保存成功");
-		  alert(param);
 		},
 		error:function(data){
 		  alert("保存失败");
 		}
 	});
+	// 刷新页面
+	window.location.reload();
 	
 }
 
@@ -410,6 +411,8 @@ function newChart(type){
 		  alert("新建失败");
 		}
 	});
+	// 刷新页面
+	window.location.reload();
 }
 
 </script>

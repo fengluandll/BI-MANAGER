@@ -18,6 +18,10 @@ public class RsTableConf implements Serializable {
 
 	private String ds_display;
 
+	private Integer ds_type;// table 数据集类型 1 标准 2自定义
+
+	private String logic; // table 里的sql
+
 	private Date create_date;
 
 	private Date modify_date;
@@ -52,6 +56,22 @@ public class RsTableConf implements Serializable {
 
 	public void setDs_display(String ds_display) {
 		this.ds_display = ds_display;
+	}
+
+	public Integer getDs_type() {
+		return ds_type;
+	}
+
+	public void setDs_type(Integer ds_type) {
+		this.ds_type = ds_type;
+	}
+
+	public String getLogic() {
+		return logic;
+	}
+
+	public void setLogic(String logic) {
+		this.logic = logic;
 	}
 
 	public Date getCreate_date() {

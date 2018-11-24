@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,6 +60,8 @@ public class ReportBoardApi {
 	public static String SEPARTOR = ",";
 	@Value("${report.url}")
 	private String REPORT_URL;
+
+	private static Logger log = LoggerFactory.getLogger(ReportBoardApi.class);
 
 	/**
 	 * 调用的api接口
@@ -131,7 +135,7 @@ public class ReportBoardApi {
 			// 图表 数据查询
 			Map<String, Object> dataList = new HashMap<String, Object>();
 			dataList = reportBoardImp.getAllDate(mDashboard, null, rsReport);
-
+			log.info("dddddddddddddddddddddd");
 			rest.put("mDashboard", mDashboard);
 			rest.put("mCharts", mCharts);
 			rest.put("dataList", dataList);

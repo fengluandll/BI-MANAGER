@@ -80,9 +80,9 @@ public class ReportBoardApi {
 			if (ID_COMP != null) {
 				params.put("ID_COMP", ID_COMP.split(SEPARTOR));
 			}
-			String ID_ORG = req.getParameter("ID_GRUP");
+			String ID_ORG = req.getParameter("ID_ORG");
 			if (ID_ORG != null) {
-				params.put("ID_GRUP", ID_ORG.split(SEPARTOR));
+				params.put("ID_ORG", ID_ORG.split(SEPARTOR));
 			}
 			String ID_E_G_P = req.getParameter("ID_E_G_P");
 			if (ID_E_G_P != null) {

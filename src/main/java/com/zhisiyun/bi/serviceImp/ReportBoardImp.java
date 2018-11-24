@@ -513,7 +513,7 @@ public class ReportBoardImp {
 				String start = "";
 				String end = "";
 				if (null != props && props.length > 0) {
-					// 有第一个时间的时候取第一个时间
+					// 有第一个时间的时候取第一个时间     服务器和本地差8小时可能要参考老代码进行修改 wangliu   20181123
 					start = props[0].toString().substring(0, 10);
 				} else {
 					// 没有就取当前时间

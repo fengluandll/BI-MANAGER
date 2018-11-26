@@ -361,6 +361,17 @@ function save(){
 	var searchItem = $("#searchItem").val();
 	config.searchItem = searchItem;
 	config.searchJson = searchJson;
+	
+	// 每次保存的时候检查 searchItem和searchJson的数量要对的上，如果searchJson多了就删除
+	var deleteKey = [];
+	for(var i in searchJson){
+	  if(searchItem.indexOf(i) == -1 ){ // searchItem中没有searchJson的key
+	     deleteKey.push(i);
+	  }
+	}
+	for(var i=0 ; i<deleteKey.length;i++){  // 删除
+	   delete searchJson[deleteKey[i]];
+	}
 
 	var param = JSON.stringify(config);
 	$.ajax({
@@ -415,17 +426,6 @@ function newChart(type){
 	config.name = name;
     // type 为参数
 	config.type = type;
-	var dataSetName = "";
-	config.dataSetName = dataSetName;
-	var dataSearch = "";
-	config.dataSearch = dataSearch;
-	var searchItem = "";
-	config.searchItem = searchItem;
-	var width = "";
-	var padding = "";
-	config.padding = padding;
-	var searchJson = {};
-	config.searchJson = searchJson;
 
 	var param = JSON.stringify(config);
 	$.ajax({

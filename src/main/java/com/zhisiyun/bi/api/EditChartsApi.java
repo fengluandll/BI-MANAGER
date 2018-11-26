@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,6 +44,8 @@ public class EditChartsApi {
 
 	@Autowired
 	private JdbcDao jdbcDao;
+	
+	private static Logger log = LoggerFactory.getLogger(ReportBoardApi.class);
 
 	/******************** chartList 列表 **************************/
 
@@ -299,7 +303,7 @@ public class EditChartsApi {
 			SqlUtils sqlUtils = new SqlUtils();
 			Map map = new HashMap();
 			String sql = sqlUtils.assemble(dataSetName, dimensionObj, measureObj, legendObj, jsonObj, map);
-			System.out.println("编辑chart sql: " + sql);
+			log.info("编辑chart sql: "+sql);
 			list = jdbcDao.query(sql, map);
 			if (list.size() > 10) {
 				list = list.subList(0, 10);
@@ -349,7 +353,7 @@ public class EditChartsApi {
 			SqlUtils sqlUtils = new SqlUtils();
 			Map map = new HashMap();
 			String sql = sqlUtils.assemble(dataSetName, rsColumnConfList, map, headers);
-			System.out.println("编辑table sql: " + sql);
+			log.info("编辑table sql: "+sql);
 			list = jdbcDao.query(sql, map);
 
 			List row;

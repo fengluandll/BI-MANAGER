@@ -88,6 +88,10 @@ public class ReportBoardApi {
 			if (ID_ORG != null) {
 				params.put("ID_ORG", ID_ORG.split(SEPARTOR));
 			}
+			String ID_EMP = req.getParameter("ID_EMP");
+            if(ID_EMP != null){
+                params.put("id_emp",ID_EMP.split(SEPARTOR));
+            }
 			String ID_E_G_P = req.getParameter("ID_E_G_P");
 			if (ID_E_G_P != null) {
 				params.put("id_emp_g", ID_E_G_P.split(SEPARTOR));
@@ -135,7 +139,6 @@ public class ReportBoardApi {
 			// 图表 数据查询
 			Map<String, Object> dataList = new HashMap<String, Object>();
 			dataList = reportBoardImp.getAllDate(mDashboard, null, rsReport);
-			log.info("dddddddddddddddddddddd");
 			rest.put("mDashboard", mDashboard);
 			rest.put("mCharts", mCharts);
 			rest.put("dataList", dataList);

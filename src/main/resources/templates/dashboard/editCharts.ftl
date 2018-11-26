@@ -347,52 +347,13 @@ function selectSearch(){
     });
 }
 
+//  新建chart
 function newChart(type){
 	var config = {};
 	var name = "";
 	config.name = name;
     // type 为参数
 	config.type = type;
-	var dataSetName = "";
-	config.dataSetName = dataSetName;
-	var dataSearch = "";
-	config.dataSearch = dataSearch;
-	var width = "";
-	config.width = width;
-	var height = "";
-	config.height = height;
-	var padding = "";
-	config.padding = padding;
-	var forceFit = "";
-	config.forceFit = forceFit;
-	var background = "";
-	config.background = background;
-	var plotBackground = "";
-	config.plotBackground = plotBackground;
-	var animate = "";
-	config.animate = animate;
-	var axis = "";
-	config.axis = axis;
-	var legend = "";
-	config.legend = legend;
-	var tooltip = "";
-	config.tooltip = tooltip;
-	var guide = "";
-	config.guide = guide;
-	var dimension = "";
-	config.dimension = dimension;
-	var measure = "";
-	config.measure = measure;
-	var color = "";
-	config.color = color;
-
-	var head = "";
-	config.head = head;
-	var title = "";
-	config.title = title;
-	
-	var searchJson = {};
-	config.searchJson = searchJson;
 
 	var param = JSON.stringify(config);
 	$.ajax({

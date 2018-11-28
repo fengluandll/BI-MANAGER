@@ -33,6 +33,7 @@ import com.zhisiyun.bi.defaultDao.JdbcDao;
 import com.zhisiyun.bi.defaultDao.MchartsMapper;
 import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
+import com.zhisiyun.bi.utils.CacheUtil;
 import com.zhisiyun.bi.utils.JsonUtils;
 
 @Service
@@ -80,7 +81,8 @@ public class ReportBoardImp {
 
 			// m_charts id
 			String chartId = searchBoardJsonList.get(0).getChartId();
-			Mcharts mchart = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			//Mcharts mchart = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			Mcharts mchart = CacheUtil.mchart.get(chartId);
 			JSONObject searchJson = JSONObject
 					.parseObject(JSON.parseObject(mchart.getConfig()).getString("searchJson"));
 
@@ -159,7 +161,8 @@ public class ReportBoardImp {
 
 			// m_charts id
 			String chartId = searchBoardJsonList.get(0).getChartId();
-			Mcharts mchart = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			//Mcharts mchart = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			Mcharts mchart = CacheUtil.mchart.get(chartId);
 			JSONObject searchJson = JSONObject
 					.parseObject(JSON.parseObject(mchart.getConfig()).getString("searchJson"));
 
@@ -242,7 +245,8 @@ public class ReportBoardImp {
 
 		// 根据 chart的数据集 拼接sql
 		String chartId = chart.getChartId();
-		Mcharts mcharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+		//Mcharts mcharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+		Mcharts mcharts = CacheUtil.mchart.get(chartId);
 		JSONObject obj = JSON.parseObject(mcharts.getConfig());
 		String type = obj.getString("type");
 
@@ -251,11 +255,14 @@ public class ReportBoardImp {
 		String color = obj.getString("color");
 		String dataSetName = obj.getString("dataSetName");
 
-		RsColumnConf dimensionBean = rsColumnConfMapper.selectOneById(Integer.parseInt(dimension));
-		RsColumnConf measureBean = rsColumnConfMapper.selectOneById(Integer.parseInt(measure));
+		//RsColumnConf dimensionBean = rsColumnConfMapper.selectOneById(Integer.parseInt(dimension));
+		RsColumnConf dimensionBean = CacheUtil.rsColumnConf.get(dimension);
+		//RsColumnConf measureBean = rsColumnConfMapper.selectOneById(Integer.parseInt(measure));
+		RsColumnConf measureBean = CacheUtil.rsColumnConf.get(measure);
 		RsColumnConf colorBean = null;
 		if (null != color && !"".equals(color)) {
-			colorBean = rsColumnConfMapper.selectOneById(Integer.parseInt(color));
+			//colorBean = rsColumnConfMapper.selectOneById(Integer.parseInt(color));
+			colorBean = CacheUtil.rsColumnConf.get(color);
 		}
 		StringBuilder builder = new StringBuilder("select ");
 		if (colorBean != null) {
@@ -284,7 +291,8 @@ public class ReportBoardImp {
 		// 拼接 点击图表的参数
 		if (null != propValue && propValue.length == 3 && StringUtils.isNotEmpty(propValue[0])
 				&& StringUtils.isNotEmpty(propValue[1])) {
-			RsColumnConf clickItemIdBean = rsColumnConfMapper.selectOneById(Integer.parseInt(propValue[0]));
+			//RsColumnConf clickItemIdBean = rsColumnConfMapper.selectOneById(Integer.parseInt(propValue[0]));
+			RsColumnConf clickItemIdBean = CacheUtil.rsColumnConf.get(propValue[0]);
 			String rsc_name = clickItemIdBean.getRsc_name();
 			builder.append(" and " + rsc_name + " = '" + propValue[1] + "' ");
 		}
@@ -336,7 +344,8 @@ public class ReportBoardImp {
 		try {
 			// 根据 chart的数据集 拼接sql
 			String chartId = chart.getChartId();
-			Mcharts mcharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			//Mcharts mcharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			Mcharts mcharts = CacheUtil.mchart.get(chartId);
 			JSONObject obj = JSON.parseObject(mcharts.getConfig());
 			String type = obj.getString("type");
 
@@ -344,14 +353,11 @@ public class ReportBoardImp {
 			String dataSetName = obj.getString("dataSetName");
 
 			// column id
-			List<Integer> ids = new ArrayList<Integer>();
 			String[] array = column.split(",");
-			for (String id : array) {
-				if ("" != id) {
-					ids.add(Integer.parseInt(id));
-				}
+			List<RsColumnConf> rsColumnConfList = new ArrayList<RsColumnConf>();
+			for(String id:array) {
+				rsColumnConfList.add(CacheUtil.rsColumnConf.get(id.toString()));
 			}
-			List<RsColumnConf> rsColumnConfList = rsColumnConfMapper.selectByIds(ids);
 
 			// 拼接sql
 			StringBuilder builder = new StringBuilder("select ");
@@ -376,7 +382,8 @@ public class ReportBoardImp {
 			// 拼接 点击图表的参数
 			if (null != propValue && propValue.length == 3 && StringUtils.isNotEmpty(propValue[0])
 					&& StringUtils.isNotEmpty(propValue[1])) {
-				RsColumnConf clickItemIdBean = rsColumnConfMapper.selectOneById(Integer.parseInt(propValue[0]));
+				//RsColumnConf clickItemIdBean = rsColumnConfMapper.selectOneById(Integer.parseInt(propValue[0]));
+				RsColumnConf clickItemIdBean = CacheUtil.rsColumnConf.get(propValue[0]);
 				String rsc_name = clickItemIdBean.getRsc_name();
 				builder.append(" and " + rsc_name + " = '" + propValue[1] + "' ");
 			}
@@ -460,7 +467,8 @@ public class ReportBoardImp {
 			JSONObject itemStyle = bean.getItemStyle();
 			String itemType = itemStyle.getString("type");
 			String chartItemId = bean.getChartItemId();
-			RsColumnConf itemBean = rsColumnConfMapper.selectOneById(Integer.parseInt(chartItemId));
+			//RsColumnConf itemBean = rsColumnConfMapper.selectOneById(Integer.parseInt(chartItemId));
+			RsColumnConf itemBean = CacheUtil.rsColumnConf.get(chartItemId);
 
 			// 参数
 			String[] props = bean.getPropsList();
@@ -569,6 +577,9 @@ public class ReportBoardImp {
 			if (StringUtils.equals("ID_ORG", key)) {
 				paramKey = "id_org";
 			}
+            if (StringUtils.equals("ID_EMP", key)) {
+				paramKey = "id_emp";
+			}
 			if (StringUtils.equals("ID_E_G_P", key)) {
 				paramKey = "id_e_g_p";
 			}
@@ -598,7 +609,8 @@ public class ReportBoardImp {
 		List restList = new ArrayList();
 		try {
 			// 根据id 查 rs_column_conf
-			RsColumnConf rsColumnConf = rsColumnConfMapper.selectOneById(Integer.parseInt(id));
+			//RsColumnConf rsColumnConf = rsColumnConfMapper.selectOneById(Integer.parseInt(id));
+			RsColumnConf rsColumnConf = CacheUtil.rsColumnConf.get(id);
 			// 根据rs_t_id 查 rs_table_conf
 			RsTableConf rsTableConf = rsTableConfMapper.selectById(rsColumnConf.getRs_t_id());
 

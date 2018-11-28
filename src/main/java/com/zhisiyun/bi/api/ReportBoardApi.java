@@ -32,6 +32,7 @@ import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsReportMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.serviceImp.ReportBoardImp;
+import com.zhisiyun.bi.utils.CacheUtil;
 
 @RestController
 @RequestMapping("api/reportBoard")
@@ -56,6 +57,9 @@ public class ReportBoardApi {
 
 	@Autowired
 	RsReportMapper rsReportMapper;
+	
+	@Autowired
+	CacheUtil cacheUtil;
 
 	public static String SEPARTOR = ",";
 	@Value("${report.url}")
@@ -117,7 +121,7 @@ public class ReportBoardApi {
 	}
 
 	/**
-	 * reportBoard 第一次 全部加载数据
+	 * reportBoard 第一次 获取 m_dashboard和 m_chart数据
 	 * 
 	 * @param boardId就是reportid
 	 * 
@@ -133,14 +137,46 @@ public class ReportBoardApi {
 		RsReport rsReport = rsReportMapper.selectByReportId(boardId);
 		try {
 			// 查询 m_dashboard 表
-			Mdashboard mDashboard = mdashboardMapper.selectById(Integer.parseInt(rsReport.getPage_id()));
+			//Mdashboard mDashboard = mdashboardMapper.selectById(Integer.parseInt(rsReport.getPage_id()));
+			Mdashboard mDashboard = CacheUtil.mDashboard.get(rsReport.getPage_id());
 			// 查询 m_charts 表
-			List<Mcharts> mCharts = mChartsMapper.selectById(Integer.parseInt(rsReport.getPage_id()));
+			//List<Mcharts> mCharts = mChartsMapper.selectById(Integer.parseInt(rsReport.getPage_id()));
+			List<Mcharts> mCharts = CacheUtil.mCharts.get(rsReport.getPage_id());
+			// 图表 数据查询
+			Map<String, Object> dataList = new HashMap<String, Object>();
+			//dataList = reportBoardImp.getAllDate(mDashboard, null, rsReport);
+			rest.put("mDashboard", mDashboard);
+			rest.put("mCharts", mCharts);
+			//rest.put("dataList", dataList);
+			rest.put("success", "success");
+		} catch (Exception e) {
+			rest.put("success", "false");
+			e.printStackTrace();
+		}
+		return rest.toJSONString();
+	}
+	
+	/**
+	 * reportBoard 第一次查询所有的数据
+	 * 
+	 * @param boardId就是reportid
+	 * 
+	 * @param config
+	 * 
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/fetchData", method = RequestMethod.POST)
+	public String fetchData(String boardId) {
+		JSONObject rest = new JSONObject();
+		// 根据 boardId(reportId) 取出RsReport
+		RsReport rsReport = rsReportMapper.selectByReportId(boardId);
+		try {
+			// 查询 m_dashboard 表
+			Mdashboard mDashboard = CacheUtil.mDashboard.get(rsReport.getPage_id());
 			// 图表 数据查询
 			Map<String, Object> dataList = new HashMap<String, Object>();
 			dataList = reportBoardImp.getAllDate(mDashboard, null, rsReport);
-			rest.put("mDashboard", mDashboard);
-			rest.put("mCharts", mCharts);
 			rest.put("dataList", dataList);
 			rest.put("success", "success");
 		} catch (Exception e) {
@@ -157,9 +193,11 @@ public class ReportBoardApi {
 			// 根据 boardId(reportId) 取出RsReport
 			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
 			// 查询 m_dashboard 表
-			Mdashboard mDashboard = mdashboardMapper.selectById(Integer.parseInt(rsReport.getPage_id()));
+			//Mdashboard mDashboard = mdashboardMapper.selectById(Integer.parseInt(rsReport.getPage_id()));
+			Mdashboard mDashboard = CacheUtil.mDashboard.get(rsReport.getPage_id());
 			// 查询 m_charts 表
-			List<Mcharts> mCharts = mChartsMapper.selectById(Integer.parseInt(rsReport.getPage_id()));
+			//List<Mcharts> mCharts = mChartsMapper.selectById(Integer.parseInt(rsReport.getPage_id()));
+			List<Mcharts> mCharts = CacheUtil.mCharts.get(rsReport.getPage_id());
 			// 查询搜索框所拥有的子组件 的 数据
 			JSONObject searchItems = new JSONObject();
 			for (Mcharts mchart : mCharts) {
@@ -303,6 +341,8 @@ public class ReportBoardApi {
 			String id = dashboard.getString("id");
 			String style_config = dashboard.getString("style_config");
 			mdashboardMapper.updateById(Integer.parseInt(id), style_config);
+			// 跟新完刷新缓存
+			cacheUtil.refreshMDashboard();
 			rest.put("success", "success");
 		} catch (Exception e) {
 			rest.put("success", "false");

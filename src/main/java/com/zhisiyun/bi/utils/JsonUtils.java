@@ -3,11 +3,14 @@ package com.zhisiyun.bi.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhisiyun.bi.bean.defaultBean.Mdashboard;
 import com.zhisiyun.bi.bean.reportPro.MchartsPro;
 import com.zhisiyun.bi.bean.reportPro.SearchBoardJson;
 import com.zhisiyun.bi.bean.reportPro.SearchRelation;
@@ -90,7 +93,7 @@ public class JsonUtils {
 									String subKey = subEntry.getKey();// relationFileds里的主key,就是被关联图表的id
 									String value = subEntry.getValue()[0];// relationFileds里的值,也就是被关联的图表的字段的名称
 									// value是 "66:1790" 也就是 被点击表id 加被关键表的字段id
-									value = value.substring(value.indexOf(":")+1, value.length());
+									value = value.substring(value.indexOf(":") + 1, value.length());
 									ret[0] = subKey;
 									ret[1] = value;
 									list.add(ret);
@@ -104,6 +107,30 @@ public class JsonUtils {
 			e.printStackTrace();
 		}
 		return list;
+	}
+
+	/********************************************************************************************************************/
+	/**
+	 * @设置m_dashboard的style_config从children中选一个
+	 * @dashboard最后要用的
+	 * @mDashboard查出来的原始的
+	 **/
+	public void setMdashboard_style_config(Mdashboard dashboard, Mdashboard mDashboard, String activeName) {
+		JSONObject style_config_obj = JSON.parseObject(mDashboard.getStyle_config());
+		JSONObject children = style_config_obj.getJSONObject("children");
+		// 如果 activeName=="" 就取第一个
+		if (null == activeName || "".equals(activeName)) {
+			// 遍历
+			for (Entry<String, Object> entry : children.entrySet()) {
+				JSONObject child = (JSONObject) entry.getValue();
+				if (child.getInteger("order") == 1) {
+					dashboard.setStyle_config(child.toString());
+				}
+			}
+		} else {
+			// 根据activeName取style_config并放入dashboard
+			dashboard.setStyle_config(children.getJSONObject(activeName).toString());
+		}
 	}
 
 }

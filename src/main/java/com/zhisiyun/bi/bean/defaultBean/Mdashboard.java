@@ -6,23 +6,28 @@ import java.util.Date;
 public class Mdashboard implements Serializable {
 
 	/**
-	 * m 仪表板配置表
+	 * 用户仪表板表
 	 * 
 	 * @author wangliu
 	 * 
 	 */
 	private static final long serialVersionUID = 1141953311686844636L;
 
-	private Integer id;
+	private Integer id; // 唯一Id
 
-	private String name;
+	private String name; // 名称
 
-	// 样式 信息 Json
-	private String style_config;
+	private String style_config; // 样式 信息 Json
 
 	private Date create_date;
 
 	private Date modify_date;
+
+	private Integer template_id; // 模板表id
+
+	private String group_id; // 组织Id、公司id
+
+	private String privilege; // 权限json
 
 	public Integer getId() {
 		return id;
@@ -62,6 +67,30 @@ public class Mdashboard implements Serializable {
 
 	public void setModify_date(Date modify_date) {
 		this.modify_date = modify_date;
+	}
+
+	public Integer getTemplate_id() {
+		return template_id;
+	}
+
+	public void setTemplate_id(Integer template_id) {
+		this.template_id = template_id;
+	}
+
+	public String getGroup_id() {
+		return group_id;
+	}
+
+	public void setGroup_id(String group_id) {
+		this.group_id = group_id;
+	}
+
+	public String getPrivilege() {
+		return privilege;
+	}
+
+	public void setPrivilege(String privilege) {
+		this.privilege = privilege;
 	}
 
 }

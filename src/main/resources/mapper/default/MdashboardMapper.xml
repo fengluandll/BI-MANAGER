@@ -7,6 +7,9 @@
 		<result column="style_config" jdbcType="VARCHAR" property="style_config" />
 		<result column="create_date" jdbcType="DATE" property="create_date" />
 		<result column="modify_date" jdbcType="DATE" property="modify_date" />
+		<result column="template_id" jdbcType="INTEGER" property="template_id" />
+		<result column="group_id" jdbcType="VARCHAR" property="group_id" />
+		<result column="privilege" jdbcType="VARCHAR" property="privilege" />
 	</resultMap>
 
 	<select id="selectAll" resultMap="BaseResultMap">
@@ -32,11 +35,12 @@
 	<insert id="add">
 		insert into m_dashboard(name) values(#{name})
 	</insert>
-	
+
 	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.Mdashboard"
 		useGeneratedKeys="true" keyProperty="id">
-		insert into m_dashboard(name)
-		values(#{name,jdbcType=VARCHAR})
+		insert into
+		m_dashboard(name,style_config,template_id,group_id)
+		values(#{name},#{style_config},#{template_id},#{group_id},)
 	</insert>
 
 </mapper>

@@ -3,6 +3,9 @@ package com.zhisiyun.bi.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -17,10 +20,12 @@ import com.zhisiyun.bi.bean.defaultBean.Mcharts;
 import com.zhisiyun.bi.bean.defaultBean.Mdashboard;
 import com.zhisiyun.bi.bean.defaultBean.RsColumnConf;
 import com.zhisiyun.bi.bean.defaultBean.RsTableConf;
+import com.zhisiyun.bi.bean.defaultBean.Tdashboard;
 import com.zhisiyun.bi.defaultDao.MchartsMapper;
 import com.zhisiyun.bi.defaultDao.MdashboardMapper;
 import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
+import com.zhisiyun.bi.defaultDao.TdashboardMapper;
 
 @Controller
 @RequestMapping("edit")
@@ -30,16 +35,28 @@ public class EditChartsController {
 	private MchartsMapper mChartsMapper;
 
 	@Autowired
-	private MdashboardMapper mDashboardMapper;
+	private TdashboardMapper tDashboardMapper;
 
 	@Autowired
 	private RsTableConfMapper rsTableConfMapper;
 
 	@Autowired
 	private RsColumnConfMapper rsColumnConfMapper;
-	
+
 	@Value("${edit.url}")
 	private String EDIT_URL;
+
+	/**
+	 * @see charts列表
+	 * @author wangliu
+	 * @serialData 20180913
+	 **/
+	@RequestMapping("/chartsList")
+	public ModelAndView chartsList(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		ModelAndView view = new ModelAndView();
+		view.setViewName("mCharts/chartsList");
+		return view;
+	}
 
 	/**
 	 * @see 编辑图表控件页面
@@ -50,7 +67,7 @@ public class EditChartsController {
 	public ModelAndView index(Model model, String id, String dashboardId) throws Exception {
 		List<Mcharts> mChartsList = null;
 		Mcharts mCharts = null;
-		Mdashboard mdashboard = null;
+		Tdashboard tdashboard = null;
 		List<RsTableConf> rsTableConfList = null;
 		try {
 			// 请求 dashboard 获取一共有多少个 组件
@@ -58,9 +75,9 @@ public class EditChartsController {
 			// 请求对应的 组件 数据
 			mCharts = mChartsMapper.selectOne(Integer.parseInt(id), Integer.parseInt(dashboardId));
 			// dashboard
-			mdashboard = mDashboardMapper.selectById(Integer.parseInt(dashboardId));
+			tdashboard = tDashboardMapper.selectById(Integer.parseInt(dashboardId));
 			// 查询 数据集(根据dashboard中配置的查询)
-			String style_config_str = mdashboard.getStyle_config();
+			String style_config_str = tdashboard.getStyle_config();
 			JSONObject obj = JSON.parseObject(style_config_str);
 			JSONArray dataSet = obj.getJSONArray("dataSet");
 			List<Integer> idList = new ArrayList<Integer>(); // rs_table_config 的 id list
@@ -77,7 +94,7 @@ public class EditChartsController {
 		model.addAttribute("mChartsList", mChartsList);
 		model.addAttribute("rsTableConfList", rsTableConfList);
 		model.addAttribute("mCharts", mCharts);
-		model.addAttribute("mdashboard", mdashboard);
+		model.addAttribute("mdashboard", tdashboard);
 		model.addAttribute("edit_url", EDIT_URL);
 
 		// 根据 type 来跳转 需要的 页面
@@ -86,13 +103,13 @@ public class EditChartsController {
 		JSONObject obj = JSON.parseObject(config);
 		String type = obj.getString("type");
 		if ("0".equals(type) || "1".equals(type) || "2".equals(type)) {
-			view.setViewName("dashboard/editCharts");
+			view.setViewName("mCharts/editCharts");
 		}
 		if ("3".equals(type)) {
-			view.setViewName("dashboard/editTable");
+			view.setViewName("mCharts/editTable");
 		}
 		if ("11".equals(type)) {
-			view.setViewName("dashboard/editSearch");
+			view.setViewName("mCharts/editSearch");
 		}
 		return view;
 	}
@@ -107,7 +124,7 @@ public class EditChartsController {
 	@RequestMapping("/chartColumn")
 	public ModelAndView chartColumn(Model model, String ds_name) throws Exception {
 		ModelAndView view = new ModelAndView();
-		view.setViewName("dashboard/chartColumn");
+		view.setViewName("mCharts/chartColumn");
 		try {
 			// 获取 rs_t_id
 			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
@@ -134,7 +151,7 @@ public class EditChartsController {
 	@RequestMapping("/tableColumn")
 	public ModelAndView tableColumn(Model model, String ds_name) throws Exception {
 		ModelAndView view = new ModelAndView();
-		view.setViewName("dashboard/tableColumn");
+		view.setViewName("mCharts/tableColumn");
 		try {
 			// 获取 rs_t_id
 			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
@@ -158,7 +175,7 @@ public class EditChartsController {
 	@RequestMapping("/dataSearch")
 	public ModelAndView dataSearch(Model model, String ds_name) throws Exception {
 		ModelAndView view = new ModelAndView();
-		view.setViewName("dashboard/dataSearch");
+		view.setViewName("mCharts/dataSearch");
 		try {
 			// 获取 rs_t_id
 			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
@@ -182,7 +199,7 @@ public class EditChartsController {
 	@RequestMapping("/addItem")
 	public ModelAndView addItem(Model model, String ds_name) throws Exception {
 		ModelAndView view = new ModelAndView();
-		view.setViewName("dashboard/lay_selectItem");
+		view.setViewName("mCharts/lay_selectItem");
 		try {
 			// 获取 rs_t_id
 			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);

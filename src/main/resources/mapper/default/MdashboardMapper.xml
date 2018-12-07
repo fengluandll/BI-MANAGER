@@ -40,7 +40,7 @@
 		useGeneratedKeys="true" keyProperty="id">
 		insert into
 		m_dashboard(name,style_config,template_id,group_id)
-		values(#{name},#{style_config},#{template_id},#{group_id},)
+		values(#{name},#{style_config},#{template_id},#{group_id})
 	</insert>
 
 </mapper>

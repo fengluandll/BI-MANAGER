@@ -10,11 +10,11 @@
 			</dd>
 		</dl>
 		<dl id="menu-article">
-			<dt><i class="Hui-iconfont">&#xe616;</i> 图表编辑<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+			<dt><i class="Hui-iconfont">&#xe616;</i> 主题模板<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
 			<dd>
 				<ul>
-				    <li><a href="${request.contextPath}/dashboard/list" title="dashboard列表">dashboard列表</a></li>
-					<li><a href="${request.contextPath}/dashboard/chartsList" title="组件设计">组件设计</a></li>
+				    <li><a href="${request.contextPath}/tDashboard/list" title="主题列表">主题列表</a></li>
+				    <li><a href="${request.contextPath}/edit/chartsList" title="组件设计">组件设计</a></li>
 				</ul>
 			</dd>
 		</dl>

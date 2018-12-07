@@ -27,6 +27,7 @@ import com.zhisiyun.bi.defaultDao.JdbcDao;
 import com.zhisiyun.bi.defaultDao.MchartsMapper;
 import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
+import com.zhisiyun.bi.utils.CacheUtil;
 import com.zhisiyun.bi.utils.SqlUtils;
 
 @RestController
@@ -44,7 +45,10 @@ public class EditChartsApi {
 
 	@Autowired
 	private JdbcDao jdbcDao;
-	
+
+	@Autowired
+	CacheUtil cacheUtil;
+
 	private static Logger log = LoggerFactory.getLogger(ReportBoardApi.class);
 
 	/******************** chartList 列表 **************************/
@@ -102,6 +106,8 @@ public class EditChartsApi {
 				name = id;
 			}
 			mChartsMapper.updateById(Integer.parseInt(id), name, config);
+			// 刷新缓存
+			cacheUtil.refreshMChartsOne(Integer.parseInt(id));
 			map.put("success", "success");
 		} catch (Exception e) {
 			map.put("success", "false");
@@ -138,7 +144,14 @@ public class EditChartsApi {
 					name = "新建" + id + "组件";
 				}
 			}
-			mChartsMapper.newChart(Integer.parseInt(id), name, config);
+			Mcharts mcharts = new Mcharts();
+			mcharts.setDashboard_id(Integer.parseInt(id));
+			mcharts.setName(name);
+			mcharts.setConfig(config);
+			mChartsMapper.newChartByBean(mcharts);
+			Integer chartId = mcharts.getId();
+			// 刷新缓存
+			cacheUtil.refreshMChartsOne(chartId);
 			map.put("success", "success");
 		} catch (Exception e) {
 			map.put("success", "false");
@@ -303,7 +316,7 @@ public class EditChartsApi {
 			SqlUtils sqlUtils = new SqlUtils();
 			Map map = new HashMap();
 			String sql = sqlUtils.assemble(dataSetName, dimensionObj, measureObj, legendObj, jsonObj, map);
-			log.info("编辑chart sql: "+sql);
+			log.info("编辑chart sql: " + sql);
 			list = jdbcDao.query(sql, map);
 			if (list.size() > 10) {
 				list = list.subList(0, 10);
@@ -353,7 +366,7 @@ public class EditChartsApi {
 			SqlUtils sqlUtils = new SqlUtils();
 			Map map = new HashMap();
 			String sql = sqlUtils.assemble(dataSetName, rsColumnConfList, map, headers);
-			log.info("编辑table sql: "+sql);
+			log.info("编辑table sql: " + sql);
 			list = jdbcDao.query(sql, map);
 
 			List row;

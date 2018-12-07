@@ -409,4 +409,67 @@ public class ReportBoardApi {
 		return rest.toJSONString();
 	}
 
+	/**
+	 * @点击搜索框子项str请求下拉列表数据
+	 * 
+	 * @props id
+	 * @props boardId(reportId)
+	 * 
+	 * @serialData 20181009
+	 * @author wangliu
+	 * 
+	 */
+	@RequestMapping(value = "/pullSynchronizationTab", method = RequestMethod.POST)
+	public String pullSynchronizationTab(String id) {
+		JSONObject rest = new JSONObject();
+		try {
+			// 客户
+			Mdashboard mDashboard = mdashboardMapper.selectById(Integer.parseInt(id));
+			// 自己
+			Tdashboard tDashboard = tdashboardMapper.selectById(mDashboard.getTemplate_id());
+			// 取出 tDashboard中key的值
+			String style_config_t = tDashboard.getStyle_config();
+			JSONObject obj_t = JSON.parseObject(style_config_t);
+			JSONObject children_t = obj_t.getJSONObject("children");
+			List<String> keys_t = new ArrayList<String>();// tDashboard所有的key
+			for (Map.Entry<String, Object> entry : children_t.entrySet()) {
+				keys_t.add(entry.getKey());
+			}
+			// 取出 mDashboard中key的值
+			String style_config_m = mDashboard.getStyle_config();
+			JSONObject obj_m = JSON.parseObject(style_config_m);
+			JSONObject children_m = obj_m.getJSONObject("children");
+			List<String> keys_m = new ArrayList<String>();// tDashboard所有的key
+			for (Map.Entry<String, Object> entry : children_m.entrySet()) {
+				keys_m.add(entry.getKey());
+			}
+			// 找出t中有的而m中没有的
+			List<String> keys = new ArrayList<String>();
+			for (int i = 0; i < keys_t.size(); i++) {
+				Boolean flag = true;
+				for (int j = 0; j < keys_m.size(); j++) {
+					if (keys_t.get(i).equals(keys_m.get(j))) {
+						flag = false;
+					}
+				}
+				if (flag) {
+					keys.add(keys_t.get(i));
+				}
+			}
+			// 根据keys把数据更新到mDashboard
+			for (int i = 0; i < keys.size(); i++) {
+				children_m.put(keys.get(i), children_t.getJSONObject(keys.get(i)));
+			}
+			String style_config_save = obj_m.toString();
+			mdashboardMapper.updateById(Integer.parseInt(id), style_config_save);// 数据库更新
+			// 跟新完刷新缓存
+			cacheUtil.refreshMDashboardone(Integer.parseInt(id));
+			rest.put("success", "true");
+		} catch (Exception e) {
+			rest.put("success", "false");
+			e.printStackTrace();
+		}
+		return rest.toJSONString();
+	}
+
 }

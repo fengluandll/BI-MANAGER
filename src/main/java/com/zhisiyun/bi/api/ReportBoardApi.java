@@ -33,6 +33,7 @@ import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsReportMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.defaultDao.TdashboardMapper;
+import com.zhisiyun.bi.serviceImp.LogDebugImp;
 import com.zhisiyun.bi.serviceImp.ReportBoardImp;
 import com.zhisiyun.bi.utils.CacheUtil;
 import com.zhisiyun.bi.utils.JsonUtils;
@@ -66,6 +67,9 @@ public class ReportBoardApi {
 
 	@Autowired
 	CacheUtil cacheUtil;
+
+	@Autowired
+	LogDebugImp logDebugImp;
 
 	public static String SEPARTOR = ",";
 	@Value("${report.url}")
@@ -139,17 +143,22 @@ public class ReportBoardApi {
 	@RequestMapping(value = "/fetch", method = RequestMethod.POST)
 	public String fetch(String boardId) {
 		JSONObject rest = new JSONObject();
-		// 根据 boardId(reportId) 取出RsReport
-		RsReport rsReport = rsReportMapper.selectByReportId(boardId);
 		try {
+			// 插入日志
+			logDebugImp.add(boardId, " : fetch  进入");
+			// 根据 boardId(reportId) 取出RsReport
+			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
 			// 取出 id_emp 和 ID_GRUP
 			String params = rsReport.getParams();
 			String userId = JSON.parseObject(params).getJSONArray("id_emp").getString(0);
 			String groupId = JSON.parseObject(params).getJSONArray("ID_GRUP").getString(0);
 			String templateId = rsReport.getPage_id(); // report表里的page_id就是templateId
 			// 判断userId是客户还是自己
-			Boolean auth = true;
-			if (auth) {
+			String user_type = "customer";
+			if (userId.equals("0")) {
+				user_type = "self";
+			}
+			if (user_type.equals("customer")) {
 				// 客户
 				Mdashboard mDashboard = CacheUtil.mDashboard.get(templateId + groupId);
 				if (null == mDashboard) {
@@ -175,6 +184,7 @@ public class ReportBoardApi {
 			}
 			List<Mcharts> mCharts = CacheUtil.mCharts.get(templateId);
 			rest.put("mCharts", mCharts);
+			rest.put("user_type", user_type);
 			rest.put("success", "success");
 		} catch (Exception e) {
 			rest.put("success", "false");
@@ -369,7 +379,7 @@ public class ReportBoardApi {
 				mdashboardMapper.updateById(Integer.parseInt(id), style_config);
 				// 跟新完刷新缓存
 				cacheUtil.refreshMDashboardone(Integer.parseInt(id));
-			} else {// 自己
+			} else if (dashboard_type.equals("self")) {// 自己
 				tdashboardMapper.updateById(Integer.parseInt(id), style_config);
 				// 跟新完刷新缓存
 				cacheUtil.refreshTDashboardone(Integer.parseInt(id));

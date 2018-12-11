@@ -52,7 +52,7 @@ public class ReportBoardImp {
 	private RsTableConfMapper rsTableConfMapper;
 
 	static SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-	
+
 	private static Logger log = LoggerFactory.getLogger(ReportBoardApi.class);
 
 	/**
@@ -63,7 +63,7 @@ public class ReportBoardImp {
 	// {name:name,type:root,children:[{name:uuuid,type:search,chartId:chartId,styleConfig:"",relation:{
 	// id:{ label:,relationFields:,props:,
 	// }},},{name:,type:tab,children:[{name:,title:,type:tab_panel,children:[{},{}]},{}]}]}
-	public Map<String, Object> getAllDate(Mdashboard mDashboard, JSONObject idColumns, RsReport rsReport) {
+	public Map<String, Object> getAllDate(Mdashboard mDashboard, RsReport rsReport) {
 		// 图表数据集合
 		Map<String, Object> mapList = new HashMap<String, Object>();
 		try {
@@ -81,7 +81,7 @@ public class ReportBoardImp {
 
 			// m_charts id
 			String chartId = searchBoardJsonList.get(0).getChartId();
-			//Mcharts mchart = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			// Mcharts mchart = mChartsMapper.selectOneById(Integer.parseInt(chartId));
 			Mcharts mchart = CacheUtil.mchart.get(chartId);
 			JSONObject searchJson = JSONObject
 					.parseObject(JSON.parseObject(mchart.getConfig()).getString("searchJson"));
@@ -145,29 +145,31 @@ public class ReportBoardImp {
 	 * 请求获取 search的数据
 	 * 
 	 **/
-	public Map<String, Object> getSearchDate(JSONArray array, String[] prop, RsReport rsReport) {
+	public Map<String, Object> getSearchDate(Mdashboard mDashboard, String[] prop, RsReport rsReport) {
 		// 图表数据集合
 		Map<String, Object> mapList = new HashMap<String, Object>();
 		try {
+			JSONObject style_config = JSON.parseObject(mDashboard.getStyle_config());
+			JSONArray childrenArray = style_config.getJSONArray("children");
 			JsonUtils jsonUtils = new JsonUtils();
 			// 遍历 m_dashboard 获取 所有的 chart
-			List<MchartsPro> mchartsProList = jsonUtils.getChartsJson(array);
+			List<MchartsPro> mchartsProList = jsonUtils.getChartsJson(childrenArray);
 
 			// 遍历所有的 搜索框 找出 fatherName 和 字段 props
-			List<SearchBoardJson> searchBoardJsonList = jsonUtils.getSearches(array);
+			List<SearchBoardJson> searchBoardJsonList = jsonUtils.getSearches(childrenArray);
 
 			// 获取 search 里面的参数啦
 			Map<String, SearchRelation> relation = searchBoardJsonList.get(0).getRelation();
 
 			// m_charts id
 			String chartId = searchBoardJsonList.get(0).getChartId();
-			//Mcharts mchart = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			// Mcharts mchart = mChartsMapper.selectOneById(Integer.parseInt(chartId));
 			Mcharts mchart = CacheUtil.mchart.get(chartId);
 			JSONObject searchJson = JSONObject
 					.parseObject(JSON.parseObject(mchart.getConfig()).getString("searchJson"));
 
 			// 如果是点击图表plot查询知道到图表的ralation,并找出关联查询的其他图表的id
-			List<String[]> plotCharts = jsonUtils.getPlotClickCharts(array, prop[2], prop[0]);
+			List<String[]> plotCharts = jsonUtils.getPlotClickCharts(childrenArray, prop[2], prop[0]);
 
 			// 循环图表 拼接 参数进行 查询
 			for (MchartsPro chart : mchartsProList) {
@@ -245,7 +247,7 @@ public class ReportBoardImp {
 
 		// 根据 chart的数据集 拼接sql
 		String chartId = chart.getChartId();
-		//Mcharts mcharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+		// Mcharts mcharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
 		Mcharts mcharts = CacheUtil.mchart.get(chartId);
 		JSONObject obj = JSON.parseObject(mcharts.getConfig());
 		String type = obj.getString("type");
@@ -255,13 +257,15 @@ public class ReportBoardImp {
 		String color = obj.getString("color");
 		String dataSetName = obj.getString("dataSetName");
 
-		//RsColumnConf dimensionBean = rsColumnConfMapper.selectOneById(Integer.parseInt(dimension));
+		// RsColumnConf dimensionBean =
+		// rsColumnConfMapper.selectOneById(Integer.parseInt(dimension));
 		RsColumnConf dimensionBean = CacheUtil.rsColumnConf.get(dimension);
-		//RsColumnConf measureBean = rsColumnConfMapper.selectOneById(Integer.parseInt(measure));
+		// RsColumnConf measureBean =
+		// rsColumnConfMapper.selectOneById(Integer.parseInt(measure));
 		RsColumnConf measureBean = CacheUtil.rsColumnConf.get(measure);
 		RsColumnConf colorBean = null;
 		if (null != color && !"".equals(color)) {
-			//colorBean = rsColumnConfMapper.selectOneById(Integer.parseInt(color));
+			// colorBean = rsColumnConfMapper.selectOneById(Integer.parseInt(color));
 			colorBean = CacheUtil.rsColumnConf.get(color);
 		}
 		StringBuilder builder = new StringBuilder("select ");
@@ -291,7 +295,8 @@ public class ReportBoardImp {
 		// 拼接 点击图表的参数
 		if (null != propValue && propValue.length == 3 && StringUtils.isNotEmpty(propValue[0])
 				&& StringUtils.isNotEmpty(propValue[1])) {
-			//RsColumnConf clickItemIdBean = rsColumnConfMapper.selectOneById(Integer.parseInt(propValue[0]));
+			// RsColumnConf clickItemIdBean =
+			// rsColumnConfMapper.selectOneById(Integer.parseInt(propValue[0]));
 			RsColumnConf clickItemIdBean = CacheUtil.rsColumnConf.get(propValue[0]);
 			String rsc_name = clickItemIdBean.getRsc_name();
 			builder.append(" and " + rsc_name + " = '" + propValue[1] + "' ");
@@ -319,7 +324,7 @@ public class ReportBoardImp {
 		builder.append(dimensionBean.getRsc_name() + " ");
 
 		String sql = builder.toString();
-		log.info("图表查询sql: "+sql);
+		log.info("图表查询sql: " + sql);
 
 		// 开始进行数据库查询
 		Map map = new HashMap();
@@ -344,7 +349,7 @@ public class ReportBoardImp {
 		try {
 			// 根据 chart的数据集 拼接sql
 			String chartId = chart.getChartId();
-			//Mcharts mcharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			// Mcharts mcharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
 			Mcharts mcharts = CacheUtil.mchart.get(chartId);
 			JSONObject obj = JSON.parseObject(mcharts.getConfig());
 			String type = obj.getString("type");
@@ -355,7 +360,7 @@ public class ReportBoardImp {
 			// column id
 			String[] array = column.split(",");
 			List<RsColumnConf> rsColumnConfList = new ArrayList<RsColumnConf>();
-			for(String id:array) {
+			for (String id : array) {
 				rsColumnConfList.add(CacheUtil.rsColumnConf.get(id.toString()));
 			}
 
@@ -382,7 +387,8 @@ public class ReportBoardImp {
 			// 拼接 点击图表的参数
 			if (null != propValue && propValue.length == 3 && StringUtils.isNotEmpty(propValue[0])
 					&& StringUtils.isNotEmpty(propValue[1])) {
-				//RsColumnConf clickItemIdBean = rsColumnConfMapper.selectOneById(Integer.parseInt(propValue[0]));
+				// RsColumnConf clickItemIdBean =
+				// rsColumnConfMapper.selectOneById(Integer.parseInt(propValue[0]));
 				RsColumnConf clickItemIdBean = CacheUtil.rsColumnConf.get(propValue[0]);
 				String rsc_name = clickItemIdBean.getRsc_name();
 				builder.append(" and " + rsc_name + " = '" + propValue[1] + "' ");
@@ -417,7 +423,7 @@ public class ReportBoardImp {
 			}
 
 			String sql = builder.toString();
-			log.info("交叉表查询sql: "+sql);
+			log.info("交叉表查询sql: " + sql);
 
 			// 开始进行数据库查询
 			Map map = new HashMap();
@@ -467,7 +473,8 @@ public class ReportBoardImp {
 			JSONObject itemStyle = bean.getItemStyle();
 			String itemType = itemStyle.getString("type");
 			String chartItemId = bean.getChartItemId();
-			//RsColumnConf itemBean = rsColumnConfMapper.selectOneById(Integer.parseInt(chartItemId));
+			// RsColumnConf itemBean =
+			// rsColumnConfMapper.selectOneById(Integer.parseInt(chartItemId));
 			RsColumnConf itemBean = CacheUtil.rsColumnConf.get(chartItemId);
 
 			// 参数
@@ -526,7 +533,7 @@ public class ReportBoardImp {
 				String start = "";
 				String end = "";
 				if (null != props && props.length > 0) {
-					// 有第一个时间的时候取第一个时间     服务器和本地差8小时可能要参考老代码进行修改 wangliu   20181123
+					// 有第一个时间的时候取第一个时间 服务器和本地差8小时可能要参考老代码进行修改 wangliu 20181123
 					start = props[0].toString().substring(0, 10);
 				} else {
 					// 没有就取当前时间
@@ -577,7 +584,7 @@ public class ReportBoardImp {
 			if (StringUtils.equals("ID_ORG", key)) {
 				paramKey = "id_org";
 			}
-            if (StringUtils.equals("ID_EMP", key)) {
+			if (StringUtils.equals("ID_EMP", key)) {
 				paramKey = "id_emp";
 			}
 			if (StringUtils.equals("ID_E_G_P", key)) {
@@ -609,7 +616,8 @@ public class ReportBoardImp {
 		List restList = new ArrayList();
 		try {
 			// 根据id 查 rs_column_conf
-			//RsColumnConf rsColumnConf = rsColumnConfMapper.selectOneById(Integer.parseInt(id));
+			// RsColumnConf rsColumnConf =
+			// rsColumnConfMapper.selectOneById(Integer.parseInt(id));
 			RsColumnConf rsColumnConf = CacheUtil.rsColumnConf.get(id);
 			// 根据rs_t_id 查 rs_table_conf
 			RsTableConf rsTableConf = rsTableConfMapper.selectById(rsColumnConf.getRs_t_id());
@@ -638,7 +646,7 @@ public class ReportBoardImp {
 			builder.append(rsColumnConf.getRsc_name());
 
 			String sql = builder.toString();
-			log.info("搜索框下拉框查询 sql: "+sql);
+			log.info("搜索框下拉框查询 sql: " + sql);
 
 			// 开始进行数据库查询
 			Map map = new HashMap();

@@ -104,7 +104,7 @@ public class ReportBoardApi {
 			}
 			String ID_EMP = req.getParameter("ID_EMP");
 			if (ID_EMP != null) {
-				params.put("id_emp", ID_EMP.split(SEPARTOR));
+				params.put("ID_EMP", ID_EMP.split(SEPARTOR));
 			}
 			String ID_E_G_P = req.getParameter("ID_E_G_P");
 			if (ID_E_G_P != null) {
@@ -215,7 +215,7 @@ public class ReportBoardApi {
 			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
 			// 图表 数据查询
 			Map<String, Object> dataList = new HashMap<String, Object>();
-			dataList = reportBoardImp.getAllDate(dashboard, null, rsReport);
+			dataList = reportBoardImp.getAllDate(dashboard, rsReport);
 			rest.put("dataList", dataList);
 			rest.put("success", "success");
 		} catch (Exception e) {
@@ -331,7 +331,7 @@ public class ReportBoardApi {
 		// 图表数据集合
 		Map<String, Object> dataList = new HashMap<String, Object>();
 		try {
-			JSONObject dashboard = object.getJSONObject("mdashboard");
+			Mdashboard dashboard = JSON.parseObject(object.getJSONObject("mDashboard").toString(), Mdashboard.class);
 			String boardId = object.getString("boardId");
 			// 根据 boardId(reportId) 取出RsReport
 			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
@@ -342,12 +342,8 @@ public class ReportBoardApi {
 				value[1] = valueArray.getString(1);// 值
 				value[2] = valueArray.getString(2);// 图表的名称(mchart表id)
 			}
-			JSONObject style_config = JSON.parseObject(dashboard.getString("style_config"));
-			JSONArray childrenArray = style_config.getJSONArray("children");
-
 			// 请求search数据
-			dataList = reportBoardImp.getSearchDate(childrenArray, value, rsReport);
-
+			dataList = reportBoardImp.getSearchDate(dashboard, value, rsReport);
 			rest.put("dataList", dataList);
 		} catch (Exception e) {
 			rest.put("success", "false");

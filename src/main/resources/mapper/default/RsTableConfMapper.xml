@@ -15,7 +15,7 @@
 	<select id="selectAll" resultMap="BaseResultMap">
 		select * from rs_table_conf
 		order by
-		id
+		substr(ds_name,1,2),cast(substr(replace(ds_name,'_','.'),3) as NUMERIC)
 	</select>
 
 	<select id="selectByName" resultMap="BaseResultMap">
@@ -39,7 +39,7 @@
 		or
 		ds_display like CONCAT('%',#{ds_name},'%')
 		order by
-		id
+		substr(ds_name,1,2),cast(substr(replace(ds_name,'_','.'),3) as NUMERIC)
 	</select>
 	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
 		insert into

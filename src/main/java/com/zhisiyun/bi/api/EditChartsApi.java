@@ -28,6 +28,7 @@ import com.zhisiyun.bi.defaultDao.MchartsMapper;
 import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.utils.CacheUtil;
+import com.zhisiyun.bi.utils.DashboardUtils;
 import com.zhisiyun.bi.utils.SqlUtils;
 
 @RestController
@@ -48,6 +49,9 @@ public class EditChartsApi {
 
 	@Autowired
 	CacheUtil cacheUtil;
+
+	@Autowired
+	DashboardUtils dashboardUtils;
 
 	private static Logger log = LoggerFactory.getLogger(ReportBoardApi.class);
 
@@ -248,6 +252,26 @@ public class EditChartsApi {
 		try {
 			rsColumnConf = rsColumnConfMapper.selectOneById(Integer.parseInt(id));
 			map.put("rsColumnConf", rsColumnConf);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return map;
+	}
+
+	/*************** mCharts方法 *******************/
+
+	/**
+	 * 获取t_dashbaord的搜索框mchart_id
+	 * 
+	 * @param t_dashboard_id
+	 * @return m_chart_id
+	 */
+	@RequestMapping(value = "/getOnlySearchId", method = RequestMethod.POST)
+	public Map<String, Object> getOnlySearchId(String t_dashboard_id) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			Integer m_chart_id = dashboardUtils.getOnlySearchId(Integer.parseInt(t_dashboard_id));
+			map.put("m_chart_id", m_chart_id);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

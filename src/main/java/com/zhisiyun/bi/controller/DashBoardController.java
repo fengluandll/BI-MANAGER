@@ -41,7 +41,7 @@ public class DashBoardController {
 	 * @see dashboard列表
 	 * @author wangliu
 	 * @serialData 20180913
-	 **/
+	 **//*
 	@RequestMapping("/list")
 	public ModelAndView list(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView view = new ModelAndView();
@@ -49,11 +49,11 @@ public class DashBoardController {
 		return view;
 	}
 
-	/**
+	*//**
 	 * @see 增加一个dashboard
 	 * @author wangliu
 	 * @serialData 20181019
-	 **/
+	 **//*
 	@RequestMapping("/addDashboard")
 	public ModelAndView addDashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView view = new ModelAndView();
@@ -61,12 +61,12 @@ public class DashBoardController {
 		return view;
 	}
 
-	/**
+	*//**
 	 * @see 跳转dashboard 编辑dateset字段关联页面
 	 * @author wangliu
 	 * @serialData 20181113
 	 * @param id:dashboardId
-	 **/
+	 **//*
 	@RequestMapping("/editDataSet")
 	public ModelAndView editDataSet(Model model, String id) throws Exception {
 		ModelAndView view = new ModelAndView();
@@ -111,11 +111,11 @@ public class DashBoardController {
 		return view;
 	}
 
-	/**
+	*//**
 	 * @see 弹窗页面编辑数据集
 	 * @author wangliu
 	 * @serialData 20181113
-	 **/
+	 **//*
 	@RequestMapping("/addDataSet")
 	public ModelAndView addDataSet(Model model, String id) throws Exception {
 		ModelAndView view = new ModelAndView();
@@ -135,11 +135,11 @@ public class DashBoardController {
 		return view;
 	}
 
-	/**
+	*//**
 	 * @see 弹窗页面编辑数据集关联
 	 * @author wangliu
 	 * @serialData 20181113
-	 **/
+	 **//*
 	@RequestMapping("/addDataSetRelation")
 	public ModelAndView addDataSetRelation(Model model, String id) throws Exception {
 		ModelAndView view = new ModelAndView();
@@ -171,13 +171,13 @@ public class DashBoardController {
 		return view;
 	}
 
-	/******************************** 下面是chart ************************/
+	*//******************************** 下面是chart ************************//*
 
-	/**
+	*//**
 	 * @see charts列表
 	 * @author wangliu
 	 * @serialData 20180913
-	 **/
+	 **//*
 	@RequestMapping("/chartsList")
 	public ModelAndView chartsList(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView view = new ModelAndView();
@@ -185,16 +185,16 @@ public class DashBoardController {
 		return view;
 	}
 
-	/**
+	*//**
 	 * @see 增加一个chart
 	 * @author wangliu
 	 * @serialData 20181019
-	 **/
+	 **//*
 	@RequestMapping("/addChart")
 	public ModelAndView addChart(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView view = new ModelAndView();
 		view.setViewName("dashboard/addChart");
 		return view;
-	}
+	}*/
 
 }

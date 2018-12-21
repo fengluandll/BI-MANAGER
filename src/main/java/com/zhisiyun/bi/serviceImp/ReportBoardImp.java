@@ -553,6 +553,8 @@ public class ReportBoardImp {
 					dateFmtType = "month";
 				} else if (date_type.equals("3")) {
 					dateFmtType = "year";
+				}else if (date_type.equals("4")) {
+					dateFmtType = "quarter";
 				}
 				if (from_type.equals("0")) {
 					// 日期区间

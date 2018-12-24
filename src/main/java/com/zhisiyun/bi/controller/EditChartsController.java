@@ -108,7 +108,7 @@ public class EditChartsController {
 		if ("3".equals(type)) {
 			view.setViewName("mCharts/editTable");
 		}
-		if ("11".equals(type)) {
+		if ("11".equals(type) || "4".equals(type)) {
 			view.setViewName("mCharts/editSearch");
 		}
 		return view;

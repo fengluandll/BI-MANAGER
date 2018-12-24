@@ -1,5 +1,7 @@
 package com.zhisiyun.bi.defaultDao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 import com.zhisiyun.bi.bean.defaultBean.RsReport;
@@ -10,6 +12,6 @@ public interface RsReportMapper {
 
 	RsReport selectByReportId(@Param("reportId") String reportId);
 	
-	RsReport selectByPageId(@Param("pageId") String pageId);
+	List<RsReport> selectByPageId(@Param("pageId") String pageId);
 
 }

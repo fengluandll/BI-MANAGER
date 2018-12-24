@@ -127,7 +127,7 @@ public class ReportBoardImp {
 					list = this.getChartDate(chart, propsBeanList, new String[0], rsReport);
 					// Map中放入 chart 的uuuuid 和 数据List
 					mapList.put(chart.getName(), list);
-				} else if (chart.getType().equals("table")) {
+				} else if (chart.getType().equals("table") || chart.getType().equals("pivottable")) {
 					Map<String, Object> map = new HashMap<>();
 					map = this.getTableDate(chart, propsBeanList, new String[0], rsReport);
 					mapList.put(chart.getName(), map);
@@ -223,7 +223,7 @@ public class ReportBoardImp {
 					list = this.getChartDate(chart, propsBeanList, propValue, rsReport);
 					// Map中放入 chart 的uuuuid 和 数据List
 					mapList.put(chart.getName(), list);
-				} else if (chart.getType().equals("table")) {
+				} else if (chart.getType().equals("table") || chart.getType().equals("pivottable")) {
 					Map<String, Object> map = new HashMap<>();
 					map = this.getTableDate(chart, propsBeanList, propValue, rsReport);
 					mapList.put(chart.getName(), map);
@@ -553,7 +553,7 @@ public class ReportBoardImp {
 					dateFmtType = "month";
 				} else if (date_type.equals("3")) {
 					dateFmtType = "year";
-				}else if (date_type.equals("4")) {
+				} else if (date_type.equals("4")) {
 					dateFmtType = "quarter";
 				}
 				if (from_type.equals("0")) {

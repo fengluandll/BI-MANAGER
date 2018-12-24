@@ -141,6 +141,10 @@ public class EditChartsApi {
 						name = "新建" + id + "Chart" + type;
 					} else if (type.equals("3")) {
 						name = "新建" + id + "Table" + type;
+					} else if (type.equals("4")) {
+						name = "新建" + id + "pivottable" + type;
+					} else if (type.equals("5")) {
+						name = "新建" + id + "perspective" + type;
 					} else if (type.equals("11")) {
 						name = "新建" + id + "Search" + type;
 					}

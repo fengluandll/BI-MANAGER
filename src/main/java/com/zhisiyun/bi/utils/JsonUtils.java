@@ -27,7 +27,7 @@ public class JsonUtils {
 					JSONObject obj = array.getJSONObject(i);
 					String type = obj.getString("type");
 					if (type.equals("line") || type.equals("bar") || type.equals("pie") || type.equals("table")
-							|| type.equals("pivottable")) {
+							|| type.equals("pivottable") || type.equals("perspective")) {
 						MchartsPro mchartsPro = new MchartsPro();
 						mchartsPro.setName(obj.getString("name"));
 						mchartsPro.setType(obj.getString("type"));

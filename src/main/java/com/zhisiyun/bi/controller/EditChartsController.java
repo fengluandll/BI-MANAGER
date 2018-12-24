@@ -105,10 +105,10 @@ public class EditChartsController {
 		if ("0".equals(type) || "1".equals(type) || "2".equals(type)) {
 			view.setViewName("mCharts/editCharts");
 		}
-		if ("3".equals(type)) {
+		if ("3".equals(type) || "4".equals(type) || "5".equals(type)) {
 			view.setViewName("mCharts/editTable");
 		}
-		if ("11".equals(type) || "4".equals(type)) {
+		if ("11".equals(type)) {
 			view.setViewName("mCharts/editSearch");
 		}
 		return view;

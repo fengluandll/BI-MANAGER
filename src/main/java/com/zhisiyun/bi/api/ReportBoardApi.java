@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhisiyun.bi.bean.defaultBean.Mcharts;
 import com.zhisiyun.bi.bean.defaultBean.Mdashboard;
+import com.zhisiyun.bi.bean.defaultBean.PrivilegeEdit;
 import com.zhisiyun.bi.bean.defaultBean.RsColumnConf;
 import com.zhisiyun.bi.bean.defaultBean.RsReport;
 import com.zhisiyun.bi.bean.defaultBean.RsTableConf;
@@ -29,6 +30,7 @@ import com.zhisiyun.bi.bean.defaultBean.Tdashboard;
 import com.zhisiyun.bi.defaultDao.JdbcDao;
 import com.zhisiyun.bi.defaultDao.MchartsMapper;
 import com.zhisiyun.bi.defaultDao.MdashboardMapper;
+import com.zhisiyun.bi.defaultDao.PrivilegeEditMapper;
 import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsReportMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
@@ -55,6 +57,9 @@ public class ReportBoardApi {
 
 	@Autowired
 	private RsTableConfMapper rsTableConfMapper;
+
+	@Autowired
+	private PrivilegeEditMapper privilegeEditMapper;
 
 	@Autowired
 	private JdbcDao jdbcDao;
@@ -86,7 +91,7 @@ public class ReportBoardApi {
 	 */
 	@RequestMapping(value = "/report", method = RequestMethod.POST)
 	public String report(HttpServletRequest req) {
-		try {
+		try {// 参数 大写的是老的 新的都是小写的,新版字段 people,client
 			String pageId = req.getParameter("pageId");
 			String reportId = UUID.randomUUID().toString();
 			JSONObject params = new JSONObject();
@@ -122,6 +127,14 @@ public class ReportBoardApi {
 			if (ID_P_R_S != null) {
 				params.put("id_pa_sr", ID_P_R_S.split(SEPARTOR));
 			}
+			String PEOPLE = req.getParameter("people");
+			if (PEOPLE != null) {
+				params.put("PEOPLE", PEOPLE.split(SEPARTOR));
+			}
+			String CLIENT = req.getParameter("client");
+			if (CLIENT != null) {
+				params.put("CLIENT", CLIENT.split(SEPARTOR));
+			}
 			rsReportMapper.add(reportId, pageId, params.toJSONString());
 			return REPORT_URL + reportId;
 		} catch (Exception e) {
@@ -150,17 +163,26 @@ public class ReportBoardApi {
 			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
 			// 取出 id_emp 和 ID_GRUP
 			String params = rsReport.getParams();
-			String userId = JSON.parseObject(params).getJSONArray("id_emp").getString(0);
-			String groupId = JSON.parseObject(params).getJSONArray("ID_GRUP").getString(0);
+			String people = JSON.parseObject(params).getJSONArray("PEOPLE").getString(0); // 用户的userId,判断权限用的,如果是自己T_dashboard就是"0"
+			String client = JSON.parseObject(params).getJSONArray("CLIENT").getString(0); // 用户的集团id,判断权限用的
 			String templateId = rsReport.getPage_id(); // report表里的page_id就是templateId
+			// 根据people判断是否有编辑页面权限
+			String user_auth = "0";
+			if (null != people && !"".equals(people)) {
+				PrivilegeEdit privilegeEdit = privilegeEditMapper.selectById(people);
+				if (null != privilegeEdit && !privilegeEdit.getId_emp().equals("")) {
+					user_auth = "1"; // "1"代表有权限
+				}
+			}
 			// 判断userId是客户还是自己
 			String user_type = "customer";
-			if (userId.equals("0")) {
+			if (null != people && people.equals("0")) {
 				user_type = "self";
+				user_auth = "1"; // 如果是自己人编辑就给编辑权限
 			}
 			if (user_type.equals("customer")) {
 				// 客户
-				Mdashboard mDashboard = CacheUtil.mDashboard.get(templateId + groupId);
+				Mdashboard mDashboard = CacheUtil.mDashboard.get(templateId + client);
 				if (null == mDashboard) {
 					// 如果m_dashboard表里还没有数据就要从t_dashboard里copy
 					Tdashboard tDashboard = CacheUtil.tDashboard.get(templateId);
@@ -168,13 +190,13 @@ public class ReportBoardApi {
 					mDashboard.setName(tDashboard.getName());
 					mDashboard.setStyle_config(tDashboard.getStyle_config());
 					mDashboard.setTemplate_id(Integer.parseInt(templateId));
-					mDashboard.setGroup_id(groupId);
+					mDashboard.setGroup_id(client);
 					mdashboardMapper.addByBean(mDashboard);
 					Integer id = mDashboard.getId();
 					// 调用刷新内存
 					cacheUtil.refreshMDashboardone(id);
 					// 重新取出
-					mDashboard = CacheUtil.mDashboard.get(templateId + groupId);
+					mDashboard = CacheUtil.mDashboard.get(templateId + client);
 				}
 				rest.put("mDashboard", mDashboard);
 			} else {
@@ -182,9 +204,11 @@ public class ReportBoardApi {
 				Tdashboard tDashboard = CacheUtil.tDashboard.get(rsReport.getPage_id());
 				rest.put("mDashboard", tDashboard);
 			}
+
 			List<Mcharts> mCharts = CacheUtil.mCharts.get(templateId);
 			rest.put("mCharts", mCharts);
 			rest.put("user_type", user_type);
+			rest.put("user_auth", user_auth);
 			rest.put("success", "success");
 		} catch (Exception e) {
 			rest.put("success", "false");

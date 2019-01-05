@@ -50,6 +50,9 @@ public class ReportBoardImp {
 
 	@Autowired
 	private RsTableConfMapper rsTableConfMapper;
+	
+	@Autowired
+	LogDebugImp logDebugImp;
 
 	static SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
@@ -327,6 +330,8 @@ public class ReportBoardImp {
 
 		String sql = builder.toString();
 		log.info("图表查询sql: " + sql);
+		// 插入日志
+		logDebugImp.add("cahrt_id: "+chart.getChartId(), "图表查询sql: " + sql);
 
 		// 开始进行数据库查询
 		Map map = new HashMap();
@@ -426,6 +431,8 @@ public class ReportBoardImp {
 
 			String sql = builder.toString();
 			log.info("交叉表查询sql: " + sql);
+			// 插入日志
+			logDebugImp.add("cahrt_id: "+chart.getChartId(), "交叉表查询sql: " + sql);
 
 			// 开始进行数据库查询
 			Map map = new HashMap();
@@ -651,6 +658,8 @@ public class ReportBoardImp {
 
 			String sql = builder.toString();
 			log.info("搜索框下拉框查询 sql: " + sql);
+			// 插入日志
+			logDebugImp.add("搜索框id: "+id, "搜索框下拉框查询 sql: " + sql);
 
 			// 开始进行数据库查询
 			Map map = new HashMap();

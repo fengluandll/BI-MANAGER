@@ -56,10 +56,11 @@
 		order by id
 	</select>
 
-	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsColumnConf">
+	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsColumnConf"
+	useGeneratedKeys="true" keyProperty="id">
 		insert into
 		rs_column_conf
-		(rs_t_id,rsc_display,rsc_name,rsc_type,rsc_formatter,rsc_remark,rsc_category)
-		values(#{rs_t_id},#{rsc_display},#{rsc_name},#{rsc_type},#{rsc_formatter},#{rsc_remark},#{rsc_category})
+		(rs_t_id,rsc_display,rsc_name,rsc_type,rsc_category,is_calc)
+		values(#{rs_t_id},#{rsc_display},#{rsc_name},#{rsc_type},#{rsc_category},#{is_calc})
 	</insert>
 </mapper>

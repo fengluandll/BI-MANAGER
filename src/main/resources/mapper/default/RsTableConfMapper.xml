@@ -41,7 +41,8 @@
 		order by
 		substr(ds_name,1,2),cast(substr(replace(ds_name,'_','.'),3) as NUMERIC)
 	</select>
-	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
+	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf"
+	useGeneratedKeys="true" keyProperty="id">
 		insert into
 		rs_table_conf(ds_id,ds_name,ds_display)
 		values(#{ds_id},#{ds_name},#{ds_display})

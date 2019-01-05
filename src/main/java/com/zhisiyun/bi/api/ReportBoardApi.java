@@ -183,9 +183,9 @@ public class ReportBoardApi {
 			if (user_type.equals("customer")) {
 				// 客户
 				Mdashboard mDashboard = CacheUtil.mDashboard.get(templateId + client);
+				Tdashboard tDashboard = CacheUtil.tDashboard.get(templateId);
 				if (null == mDashboard) {
 					// 如果m_dashboard表里还没有数据就要从t_dashboard里copy
-					Tdashboard tDashboard = CacheUtil.tDashboard.get(templateId);
 					mDashboard = new Mdashboard();
 					mDashboard.setName(tDashboard.getName());
 					mDashboard.setStyle_config(tDashboard.getStyle_config());
@@ -199,6 +199,7 @@ public class ReportBoardApi {
 					mDashboard = CacheUtil.mDashboard.get(templateId + client);
 				}
 				rest.put("mDashboard", mDashboard);
+				rest.put("tDashboard", tDashboard);
 			} else {
 				// 自己
 				Tdashboard tDashboard = CacheUtil.tDashboard.get(rsReport.getPage_id());
@@ -423,20 +424,20 @@ public class ReportBoardApi {
 	 * 
 	 */
 	@RequestMapping(value = "/searchItemData", method = RequestMethod.POST)
-	public String searchItemData(@RequestParam(value = "id", required = true) String id, String boardId) {
-		JSONObject rest = new JSONObject();
+	public Map<String, Object> searchItemData(@RequestParam(value = "id", required = true) String id, String boardId) {
+		Map<String, Object> map = new HashMap<String, Object>();
 		// 图表数据集合
 		List dataList = new ArrayList();
 		try {
 			// 根据 boardId(reportId) 取出RsReport
 			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
 			dataList = reportBoardImp.searchItemData(id, rsReport);
-			rest.put("list", dataList);
+			map.put(id, dataList);
 		} catch (Exception e) {
-			rest.put("success", "false");
+			map.put("success", "false");
 			e.printStackTrace();
 		}
-		return rest.toJSONString();
+		return map;
 	}
 
 	/**

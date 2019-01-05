@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhisiyun.bi.bean.BaseBean;
 import com.zhisiyun.bi.bean.defaultBean.Mcharts;
 import com.zhisiyun.bi.bean.defaultBean.Mdashboard;
 import com.zhisiyun.bi.bean.defaultBean.RsColumnConf;
@@ -105,8 +106,11 @@ public class EditChartsController {
 		if ("0".equals(type) || "1".equals(type) || "2".equals(type)) {
 			view.setViewName("mCharts/editCharts");
 		}
-		if ("3".equals(type) || "4".equals(type) || "5".equals(type)) {
+		if ("3".equals(type) || "5".equals(type)) {
 			view.setViewName("mCharts/editTable");
+		}
+		if ("4".equals(type)) {
+			view.setViewName("mCharts/editPivottable");
 		}
 		if ("11".equals(type)) {
 			view.setViewName("mCharts/editSearch");
@@ -149,7 +153,7 @@ public class EditChartsController {
 	 *            数据集table 名称
 	 **/
 	@RequestMapping("/tableColumn")
-	public ModelAndView tableColumn(Model model, String ds_name) throws Exception {
+	public ModelAndView tableColumn(Model model, String ds_name,String type) throws Exception {
 		ModelAndView view = new ModelAndView();
 		view.setViewName("mCharts/tableColumn");
 		try {
@@ -157,8 +161,10 @@ public class EditChartsController {
 			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
 			// 维度 rsc_category = 1
 			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
+			BaseBean baseBean = new BaseBean();
 			model.addAttribute("dimension", dimension);
 			model.addAttribute("rsTableConf", rsTableConf);
+			model.addAttribute("type", type);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

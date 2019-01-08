@@ -27,6 +27,7 @@ import com.zhisiyun.bi.bean.defaultBean.RsColumnConf;
 import com.zhisiyun.bi.bean.defaultBean.RsReport;
 import com.zhisiyun.bi.bean.defaultBean.RsTableConf;
 import com.zhisiyun.bi.bean.defaultBean.Tdashboard;
+import com.zhisiyun.bi.bean.reportPro.SearchBean;
 import com.zhisiyun.bi.defaultDao.JdbcDao;
 import com.zhisiyun.bi.defaultDao.MchartsMapper;
 import com.zhisiyun.bi.defaultDao.MdashboardMapper;
@@ -37,8 +38,8 @@ import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.defaultDao.TdashboardMapper;
 import com.zhisiyun.bi.serviceImp.LogDebugImp;
 import com.zhisiyun.bi.serviceImp.ReportBoardImp;
+import com.zhisiyun.bi.serviceImp.ReportBoardImpPro;
 import com.zhisiyun.bi.utils.CacheUtil;
-import com.zhisiyun.bi.utils.JsonUtils;
 
 @RestController
 @RequestMapping("api/reportBoard")
@@ -66,6 +67,9 @@ public class ReportBoardApi {
 
 	@Autowired
 	ReportBoardImp reportBoardImp;
+
+	@Autowired
+	ReportBoardImpPro reportBoardImpPro;
 
 	@Autowired
 	RsReportMapper rsReportMapper;
@@ -375,6 +379,32 @@ public class ReportBoardApi {
 			e.printStackTrace();
 		}
 		return rest.toJSONString();
+	}
+
+	/***
+	 * 通用查询方法
+	 * 
+	 ***/
+	@RequestMapping(value = "/search", method = RequestMethod.POST)
+	public Map<String, Object> search(String params) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 图表数据集合
+		Map<String, Object> dataList = new HashMap<String, Object>();
+		try {
+			JSONObject object = JSON.parseObject(params);
+			String param = object.getString("params");
+			// 取出传过来的参数
+			SearchBean searchBean = JSON.parseObject(param, SearchBean.class);
+			// 根据 boardId(reportId) 取出RsReport
+			RsReport rsReport = rsReportMapper.selectByReportId(searchBean.getReport_id());
+			// 请求search数据
+			dataList = reportBoardImpPro.search(rsReport, searchBean);
+			map.put("dataList", dataList);
+		} catch (Exception e) {
+			map.put("success", "false");
+			e.printStackTrace();
+		}
+		return map;
 	}
 
 	/**

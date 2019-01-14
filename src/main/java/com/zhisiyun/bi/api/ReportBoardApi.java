@@ -28,8 +28,6 @@ import com.zhisiyun.bi.bean.defaultBean.RsReport;
 import com.zhisiyun.bi.bean.defaultBean.RsTableConf;
 import com.zhisiyun.bi.bean.defaultBean.Tdashboard;
 import com.zhisiyun.bi.bean.reportPro.SearchBean;
-import com.zhisiyun.bi.defaultDao.JdbcDao;
-import com.zhisiyun.bi.defaultDao.MchartsMapper;
 import com.zhisiyun.bi.defaultDao.MdashboardMapper;
 import com.zhisiyun.bi.defaultDao.PrivilegeEditMapper;
 import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
@@ -40,12 +38,14 @@ import com.zhisiyun.bi.serviceImp.LogDebugImp;
 import com.zhisiyun.bi.serviceImp.ReportBoardImp;
 import com.zhisiyun.bi.serviceImp.ReportBoardImpPro;
 import com.zhisiyun.bi.utils.CacheUtil;
+import com.zhisiyun.bi.utils.MchartsUtils;
+import com.zhisiyun.bi.utils.ReportUtils;
 
 @RestController
 @RequestMapping("api/reportBoard")
 public class ReportBoardApi {
 	@Autowired
-	private MchartsMapper mChartsMapper;
+	private ReportUtils reportUtils;
 
 	@Autowired
 	private TdashboardMapper tdashboardMapper;
@@ -63,9 +63,6 @@ public class ReportBoardApi {
 	private PrivilegeEditMapper privilegeEditMapper;
 
 	@Autowired
-	private JdbcDao jdbcDao;
-
-	@Autowired
 	ReportBoardImp reportBoardImp;
 
 	@Autowired
@@ -76,6 +73,9 @@ public class ReportBoardApi {
 
 	@Autowired
 	CacheUtil cacheUtil;
+
+	@Autowired
+	MchartsUtils mchartsUtils;
 
 	@Autowired
 	LogDebugImp logDebugImp;
@@ -143,6 +143,7 @@ public class ReportBoardApi {
 			return REPORT_URL + reportId;
 		} catch (Exception e) {
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 			return "";
 		}
 	}
@@ -160,12 +161,13 @@ public class ReportBoardApi {
 	@RequestMapping(value = "/fetch", method = RequestMethod.POST)
 	public String fetch(String boardId) {
 		JSONObject rest = new JSONObject();
+		Tdashboard tdashboardAll = null; // 全局Tdashboard用来给idColumns查询用的 add by wangliu 20190111
 		try {
 			// 插入日志
 			logDebugImp.add(boardId, " : fetch  进入");
 			// 根据 boardId(reportId) 取出RsReport
 			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
-			// 取出 id_emp 和 ID_GRUP
+			// 获取参数 取出 id_emp 和 ID_GRUP
 			String params = rsReport.getParams();
 			String people = JSON.parseObject(params).getJSONArray("PEOPLE").getString(0); // 用户的userId,判断权限用的,如果是自己T_dashboard就是"0"
 			String client = JSON.parseObject(params).getJSONArray("CLIENT").getString(0); // 用户的集团id,判断权限用的
@@ -204,20 +206,25 @@ public class ReportBoardApi {
 				}
 				rest.put("mDashboard", mDashboard);
 				rest.put("tDashboard", tDashboard);
+				tdashboardAll = tDashboard;
 			} else {
 				// 自己
 				Tdashboard tDashboard = CacheUtil.tDashboard.get(rsReport.getPage_id());
 				rest.put("mDashboard", tDashboard);
+				tdashboardAll = tDashboard;
 			}
-
 			List<Mcharts> mCharts = CacheUtil.mCharts.get(templateId);
+			// 查询每个图表所拥有的 维度 度量图例 和 搜索框的 子组件 所在 字段 的对应的表数据
+			Map<String, Object> idColumns = reportUtils.getColumnsByDateSet(tdashboardAll);
 			rest.put("mCharts", mCharts);
+			rest.put("idColumns", idColumns);
 			rest.put("user_type", user_type);
 			rest.put("user_auth", user_auth);
 			rest.put("success", "success");
 		} catch (Exception e) {
 			rest.put("success", "false");
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return rest.toJSONString();
 	}
@@ -250,70 +257,18 @@ public class ReportBoardApi {
 		} catch (Exception e) {
 			rest.put("success", "false");
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return rest.toJSONString();
 	}
 
 	@RequestMapping(value = "/fetchEdit", method = RequestMethod.POST)
-	public String fetchEdit(String boardId) {
-		JSONObject rest = new JSONObject();
+	public Map<String, Object> fetchEdit(String boardId) {
+		Map<String, Object> map = new HashMap<String, Object>();
 		try {
 			// 根据 boardId(reportId) 取出RsReport
 			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
 			List<Mcharts> mCharts = CacheUtil.mCharts.get(rsReport.getPage_id());
-			// 查询搜索框所拥有的子组件 的 数据
-			JSONObject searchItems = new JSONObject();
-			for (Mcharts mchart : mCharts) {
-				String config = mchart.getConfig();
-				JSONObject object = JSON.parseObject(config);
-				String type = object.getString("type");
-				if (type.equals("11")) {
-					String[] searchItem = object.getString("searchItem").split(",");
-					for (String id : searchItem) {
-						// 根据 id 查rs_column_config表
-						RsColumnConf item = rsColumnConfMapper.selectOneById(Integer.parseInt(id));
-						searchItems.put(id, item);
-					}
-				}
-			}
-
-			// 查询每个图表所拥有的 维度 度量图例 和 搜索框的 子组件 所在 字段 的对应的表数据
-			JSONObject idColumns = new JSONObject();
-			for (Mcharts mchart : mCharts) {
-				String config = mchart.getConfig();
-				JSONObject object = JSON.parseObject(config);
-				String type = object.getString("type");
-				if (type.equals("0") || type.equals("1")) { // 折线图 柱状图
-					String[] idColumn = (object.getString("dimension") + "," + object.getString("measure") + ","
-							+ object.getString("color")).split(",");
-					for (String id : idColumn) {
-						// 根据 id 查rs_column_config表
-						RsColumnConf item = rsColumnConfMapper.selectOneById(Integer.parseInt(id));
-						idColumns.put(id, item);
-					}
-				} else if (type.equals("2")) { // 饼图
-					String[] idColumn = (object.getString("dimension") + "," + object.getString("color")).split(",");
-					for (String id : idColumn) {
-						// 根据 id 查rs_column_config表
-						RsColumnConf item = rsColumnConfMapper.selectOneById(Integer.parseInt(id));
-						idColumns.put(id, item);
-					}
-				} else if (type.equals("3")) { // 交叉表
-					String[] idColumn = object.getString("column").split(",");
-					for (String id : idColumn) {
-						// 根据 id 查rs_column_config表
-						RsColumnConf item = rsColumnConfMapper.selectOneById(Integer.parseInt(id));
-						idColumns.put(id, item);
-					}
-				} else if (type.equals("11")) { // 搜索框
-					String[] idColumn = object.getString("searchItem").split(",");
-					for (String id : idColumn) {
-						// 根据 id 查rs_column_config表
-						RsColumnConf item = rsColumnConfMapper.selectOneById(Integer.parseInt(id));
-						idColumns.put(id, item);
-					}
-				}
-			}
 			// 查询每个图表 所拥有的 数据集 的 所有字段 的表数据
 			JSONObject tableIdColumns = new JSONObject();
 			String sameDataSetName = "";
@@ -329,15 +284,14 @@ public class ReportBoardApi {
 				sameDataSetName = sameDataSetName + dataSetName;
 			}
 
-			rest.put("searchItems", searchItems);
-			rest.put("idColumns", idColumns);
-			rest.put("tableIdColumns", tableIdColumns);
-			rest.put("success", "success");
+			map.put("tableIdColumns", tableIdColumns);
+			map.put("success", "success");
 		} catch (Exception e) {
-			rest.put("success", "false");
+			map.put("success", "false");
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
-		return rest.toJSONString();
+		return map;
 	}
 
 	/**
@@ -377,6 +331,7 @@ public class ReportBoardApi {
 		} catch (Exception e) {
 			rest.put("success", "false");
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return rest.toJSONString();
 	}
@@ -403,6 +358,7 @@ public class ReportBoardApi {
 		} catch (Exception e) {
 			map.put("success", "false");
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return map;
 	}
@@ -439,6 +395,7 @@ public class ReportBoardApi {
 		} catch (Exception e) {
 			rest.put("success", "false");
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return rest.toJSONString();
 	}
@@ -461,11 +418,12 @@ public class ReportBoardApi {
 		try {
 			// 根据 boardId(reportId) 取出RsReport
 			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
-			dataList = reportBoardImp.searchItemData(id, rsReport);
+			dataList = reportBoardImpPro.searchItemData(id, rsReport);
 			map.put(id, dataList);
 		} catch (Exception e) {
 			map.put("success", "false");
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return map;
 	}
@@ -529,6 +487,7 @@ public class ReportBoardApi {
 		} catch (Exception e) {
 			rest.put("success", "false");
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return rest.toJSONString();
 	}

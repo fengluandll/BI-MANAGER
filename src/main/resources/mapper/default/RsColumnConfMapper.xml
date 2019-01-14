@@ -44,6 +44,17 @@
 		rs_t_id = #{rs_t_id}
 		order by id
 	</select>
+	
+	<select id="selectIdsByTableIds" resultType="String">
+		select id from
+		rs_column_conf where
+		rs_t_id in
+		<foreach collection="rs_t_ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		order by id
+	</select>
 
 	<select id="selectOneById" resultMap="BaseResultMap">
 		select * from

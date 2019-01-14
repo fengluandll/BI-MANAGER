@@ -13,6 +13,8 @@ public interface RsColumnConfMapper {
 	List<RsColumnConf> selectByTableId(@Param("rs_t_id") Integer rs_t_id);
 	
 	List<String> selectIdsByTableId(@Param("rs_t_id") Integer rs_t_id);
+	
+	List<String> selectIdsByTableIds(@Param("rs_t_ids") List<Integer> rs_t_ids);
 
 	List<RsColumnConf> selectByTableIdAndType(@Param("rs_t_id") Integer rs_t_id,
 			@Param("rsc_category") Integer rsc_category);

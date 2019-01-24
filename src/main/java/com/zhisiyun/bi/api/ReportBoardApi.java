@@ -277,7 +277,7 @@ public class ReportBoardApi {
 				String config = mchart.getConfig();
 				JSONObject object = JSON.parseObject(config);
 				String dataSetName = object.getString("dataSetName");
-				if (!sameDataSetName.contains(dataSetName)) {
+				if (null!=dataSetName&&!sameDataSetName.contains(dataSetName)) {
 					RsTableConf rsTableConf = rsTableConfMapper.selectByName(dataSetName).get(0);
 					List<RsColumnConf> tableIdColumn = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
 					tableIdColumns.put(dataSetName, tableIdColumn);

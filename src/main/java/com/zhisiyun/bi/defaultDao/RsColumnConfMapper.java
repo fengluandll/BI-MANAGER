@@ -10,18 +10,18 @@ public interface RsColumnConfMapper {
 
 	List<RsColumnConf> selectAll();
 
-	List<RsColumnConf> selectByTableId(@Param("rs_t_id") Integer rs_t_id);
+	List<RsColumnConf> selectByTableId(@Param("rs_t_id") String rs_t_id);
 	
-	List<String> selectIdsByTableId(@Param("rs_t_id") Integer rs_t_id);
+	List<String> selectIdsByTableId(@Param("rs_t_id") String rs_t_id);
 	
-	List<String> selectIdsByTableIds(@Param("rs_t_ids") List<Integer> rs_t_ids);
+	List<String> selectIdsByTableIds(@Param("rs_t_ids") List<String> rs_t_ids);
 
-	List<RsColumnConf> selectByTableIdAndType(@Param("rs_t_id") Integer rs_t_id,
-			@Param("rsc_category") Integer rsc_category);
+	List<RsColumnConf> selectByTableIdAndType(@Param("rs_t_id") String rs_t_id,
+			@Param("type_ids") List<String> type_ids);
 
-	RsColumnConf selectOneById(@Param("id") Integer id);
+	RsColumnConf selectOneById(@Param("id") String id);
 
-	List<RsColumnConf> selectByIds(@Param("ids") List<Integer> ids);
+	List<RsColumnConf> selectByIds(@Param("ids") List<String> ids);
 
 	int addByBean(RsColumnConf rsColumnConf);
 

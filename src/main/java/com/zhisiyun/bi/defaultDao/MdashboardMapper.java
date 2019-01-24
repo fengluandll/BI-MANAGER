@@ -10,11 +10,11 @@ public interface MdashboardMapper {
 
 	List<Mdashboard> selectAll();
 
-	Mdashboard selectById(@Param("id") Integer id);
+	Mdashboard selectById(@Param("id") String id);
 
 	List<Mdashboard> selectByName(@Param("name") String name);
 
-	int updateById(@Param("id") Integer id, @Param("style_config") String style_config);
+	int updateById(@Param("id") String id, @Param("style_config") String style_config);
 
 	int add(@Param("name") String name);
 	

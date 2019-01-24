@@ -1,6 +1,5 @@
 package com.zhisiyun.bi.api;
 
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +28,7 @@ import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.utils.CacheUtil;
 import com.zhisiyun.bi.utils.DashboardUtils;
+import com.zhisiyun.bi.utils.MD5Uitls;
 import com.zhisiyun.bi.utils.SqlUtils;
 
 @RestController
@@ -76,7 +76,7 @@ public class EditChartsApi {
 		try {
 			List<Mcharts> chartList = null;
 			if (null != boardId && !"".equals(boardId)) {
-				chartList = mChartsMapper.selectById(Integer.parseInt(boardId));
+				chartList = mChartsMapper.selectById(boardId);
 			} else {
 				chartList = mChartsMapper.selectAll();
 			}
@@ -94,7 +94,7 @@ public class EditChartsApi {
 	/**
 	 * 图表编辑保存
 	 * 
-	 * @param id
+	 * @param id:唯一键Id
 	 * @param config
 	 * 
 	 * @return
@@ -106,12 +106,33 @@ public class EditChartsApi {
 			// 获取去chart表的 name
 			JSONObject object = JSON.parseObject(config);
 			String name = object.getString("name");
+			String type = object.getString("type");
 			if ("".equals(name)) {
 				name = id;
 			}
-			mChartsMapper.updateById(Integer.parseInt(id), name, config);
-			// 刷新缓存
-			cacheUtil.refreshMChartsOne(Integer.parseInt(id));
+			Mcharts mcharts = mChartsMapper.selectOneById(id);// 根据唯一键找一个
+			String is_active = mcharts.getIs_active();
+			if (is_active.equals("Y")) {
+				Mcharts m = new Mcharts();
+				m.setId(id);
+				m.setName(name);
+				m.setMc_type(Integer.parseInt(type));
+				m.setConfig(config);
+				mChartsMapper.updateById(m); // 如果是可用状态就直接更新config和name
+				// 刷新缓存
+				cacheUtil.refreshMChartsOne(id);
+			} else if (is_active.equals("N")) {
+				Mcharts m = new Mcharts();
+				m.setId(id);
+				m.setName(name);
+				m.setMc_type(Integer.parseInt(type));
+				m.setConfig(config);
+				mChartsMapper.updateById(m);
+				String md5_id = MD5Uitls.getMD5Id(mcharts.getDashboard_id() + config); // 不是可用状态就生成唯一键
+				mChartsMapper.updateBySnId(mcharts.getSn_id(), md5_id, "Y"); // 根据流水号Id更新唯一键Id
+				// 刷新缓存
+				cacheUtil.refreshMChartsOne(md5_id);
+			}
 			map.put("success", "success");
 		} catch (Exception e) {
 			map.put("success", "false");
@@ -131,6 +152,15 @@ public class EditChartsApi {
 	public Map<String, Object> newChart(String id, String config) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
+			/***
+			 * 由于现在的逻辑是拿config算md5所以刚新建的时候大家的md5id是一样的,要等mchart编辑之后才会改变.现在的逻辑就是先拿md5id判断下如果有相同的就返回
+			 ***/
+			String mchart_id = MD5Uitls.getMD5Id(id + config); // 根据config生成mcharts的唯一键
+			Mcharts mcharts_old = mChartsMapper.selectOneById(mchart_id); // 根据md5id查询
+			if (null != mcharts_old) {
+				map.put("success", "false");
+				return map;
+			}
 			// 获取去chart表的 name
 			JSONObject object = JSON.parseObject(config);
 			String name = object.getString("name");
@@ -155,13 +185,18 @@ public class EditChartsApi {
 				}
 			}
 			Mcharts mcharts = new Mcharts();
-			mcharts.setDashboard_id(Integer.parseInt(id));
+			mcharts.setDashboard_id(id);
 			mcharts.setName(name);
+			mcharts.setMc_type(Integer.parseInt(type));
 			mcharts.setConfig(config);
+			mcharts.setId("tmp"); // 防止不为空报错
+			mcharts.setIs_active("N"); // 一开始设置为N等第一次保存的时候改为Y
 			mChartsMapper.newChartByBean(mcharts);
-			Integer chartId = mcharts.getId();
+			Integer sn_id = mcharts.getSn_id();
+
+			mChartsMapper.updateBySnId(sn_id, mchart_id, "N"); // 插入mcharts的唯一键
 			// 刷新缓存
-			cacheUtil.refreshMChartsOne(chartId);
+			cacheUtil.refreshMChartsOne(mchart_id);
 			map.put("success", "success");
 		} catch (Exception e) {
 			map.put("success", "false");
@@ -179,11 +214,11 @@ public class EditChartsApi {
 	 * @return
 	 */
 	@RequestMapping(value = "/deleteChart", method = RequestMethod.POST)
-	public Map<String, Object> deleteChart(String id, String dashboard_id) {
+	public Map<String, Object> deleteChart(String sn_id) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
-			if (null != id && null != dashboard_id) {
-				mChartsMapper.deleteChart(Integer.parseInt(id), Integer.parseInt(dashboard_id));
+			if (null != sn_id) {
+				mChartsMapper.deleteChartBySnId(Integer.parseInt(sn_id));
 			}
 			map.put("success", "success");
 		} catch (Exception e) {
@@ -228,11 +263,11 @@ public class EditChartsApi {
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<RsColumnConf> rsColumnConfList = null;
 		try {
-			List<Integer> idStr = new ArrayList<Integer>();
+			List<String> idStr = new ArrayList<String>();
 			String[] array = idList.split(",");
 			for (String id : array) {
 				if ("" != id) {
-					idStr.add(Integer.parseInt(id));
+					idStr.add(id);
 				}
 			}
 			// 查询数据集 的 字段
@@ -256,7 +291,7 @@ public class EditChartsApi {
 		Map<String, Object> map = new HashMap<String, Object>();
 		RsColumnConf rsColumnConf = null;
 		try {
-			rsColumnConf = rsColumnConfMapper.selectOneById(Integer.parseInt(id));
+			rsColumnConf = rsColumnConfMapper.selectOneById(id);
 			map.put("rsColumnConf", rsColumnConf);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -276,8 +311,8 @@ public class EditChartsApi {
 	public Map<String, Object> getOnlySearchId(String t_dashboard_id) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
-			Integer m_chart_id = dashboardUtils.getOnlySearchId(Integer.parseInt(t_dashboard_id));
-			map.put("m_chart_id", m_chart_id);
+			Mcharts search = mChartsMapper.selectSearchByBoardId(t_dashboard_id);
+			map.put("sn_id", search.getSn_id());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -293,17 +328,13 @@ public class EditChartsApi {
 	 * @param json
 	 * @return
 	 */
-	@RequestMapping(value = "/findType", method = RequestMethod.POST)
-	public String findType(String chartId) {
+	@RequestMapping(value = "/findMcharts", method = RequestMethod.POST)
+	public String findMcharts(String chartId) {
 		JSONObject rest = new JSONObject();
 		try {
 			// 根据 chartId 查询出表 m_charts表
-			Mcharts mCharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
-			// 解析出param
-			String config = mCharts.getConfig();
-			JSONObject object = JSON.parseObject(config);
-			String type = object.getString("type");
-			rest.put("type", type);
+			Mcharts mCharts = mChartsMapper.selectOneById(chartId);
+			rest.put("mCharts", mCharts);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -323,7 +354,7 @@ public class EditChartsApi {
 		List list = new ArrayList();
 		try {
 			// 根据 chartId 查询出表 m_charts表
-			Mcharts mCharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			Mcharts mCharts = mChartsMapper.selectOneById(chartId);
 			// 解析出param
 			String config = mCharts.getConfig();
 			JSONObject object = JSON.parseObject(config);
@@ -332,11 +363,11 @@ public class EditChartsApi {
 			String measure = object.getString("measure").split(",")[0];
 			String legend = object.getString("color").split(",")[0];
 
-			RsColumnConf dimensionObj = rsColumnConfMapper.selectOneById(Integer.parseInt(dimension));
-			RsColumnConf measureObj = rsColumnConfMapper.selectOneById(Integer.parseInt(measure));
+			RsColumnConf dimensionObj = rsColumnConfMapper.selectOneById(dimension);
+			RsColumnConf measureObj = rsColumnConfMapper.selectOneById(measure);
 			RsColumnConf legendObj = null;
 			if (null != legend && !"".equals(legend)) {
-				legendObj = rsColumnConfMapper.selectOneById(Integer.parseInt(legend));
+				legendObj = rsColumnConfMapper.selectOneById(legend);
 			}
 
 			// where 条件
@@ -378,17 +409,17 @@ public class EditChartsApi {
 		data.put("body", body);
 		try {
 			// 根据 chartId 查询出表 m_charts表
-			Mcharts mCharts = mChartsMapper.selectOneById(Integer.parseInt(chartId));
+			Mcharts mCharts = mChartsMapper.selectOneById(chartId);
 			// 解析出param
 			String config = mCharts.getConfig();
 			JSONObject object = JSON.parseObject(config);
 			String column = object.getString("column");
 			String dataSetName = object.getString("dataSetName");
-			List<Integer> ids = new ArrayList<Integer>();
+			List<String> ids = new ArrayList<String>();
 			String[] array = column.split(",");
 			for (String id : array) {
 				if ("" != id) {
-					ids.add(Integer.parseInt(id));
+					ids.add(id);
 				}
 			}
 			List<RsColumnConf> rsColumnConfList = rsColumnConfMapper.selectByIds(ids);
@@ -414,11 +445,6 @@ public class EditChartsApi {
 						rsColumnConf = meaMap.get(header);
 						val = m.get(header);
 						if (val != null && rsColumnConf != null && rsColumnConf.getRsc_type() == 1) {
-							// 是否存在单位换算值
-							if (rsColumnConf.getRsc_conversion() != null) {
-								val = new BigDecimal(String.valueOf(val))
-										.multiply(new BigDecimal(rsColumnConf.getRsc_conversion()));
-							}
 							// 是否存在数值格式化公式
 							if (StringUtils.isNotEmpty(rsColumnConf.getRsc_formatter())) {
 								val = new DecimalFormat(rsColumnConf.getRsc_formatter()).format(val);

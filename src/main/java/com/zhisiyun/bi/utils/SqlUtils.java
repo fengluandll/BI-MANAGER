@@ -86,7 +86,7 @@ public class SqlUtils {
 		StringBuilder builder = new StringBuilder("select ");
 		List<String> cols = new ArrayList<>();
 		for (RsColumnConf rs : list) {
-			if (rs.getIs_calc().equals("N") && rs.getRsc_category().equals(2)) {
+			if (rs.getIs_calc().equals("N")) {
 				cols.add(" sum(" + rs.getRsc_name() + ") as " + rs.getRsc_display());
 			} else {
 				cols.add(rs.getRsc_name() + " as " + rs.getRsc_display());
@@ -100,7 +100,7 @@ public class SqlUtils {
 		// 拼接group by
 		List<String> groupBy = new ArrayList<>();
 		for (RsColumnConf rs : list) {
-			if (rs.getRsc_category().equals(1)) {// 只有维度可以group by 20181122
+			if ("".equals("判断维度")) {// 只有维度可以group by 20181122
 				groupBy.add(rs.getRsc_name());
 			}
 		}

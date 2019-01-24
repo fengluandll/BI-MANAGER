@@ -2,47 +2,53 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zhisiyun.bi.defaultDao.RsColumnConfMapper">
 	<resultMap id="BaseResultMap" type="com.zhisiyun.bi.bean.defaultBean.RsColumnConf">
-		<id column="id" jdbcType="INTEGER" property="id" />
+	    <id column="sn_id" jdbcType="INTEGER" property="sn_id" />
+		<result column="id" jdbcType="VARCHAR" property="id" />
 		<result column="rs_t_id" jdbcType="INTEGER" property="rs_t_id" />
 		<result column="is_calc" jdbcType="VARCHAR" property="is_calc" />
-		<result column="rsc_category" jdbcType="INTEGER" property="rsc_category" />
 		<result column="rsc_display" jdbcType="VARCHAR" property="rsc_display" />
 		<result column="rsc_formatter" jdbcType="VARCHAR" property="rsc_formatter" />
+		<result column="rsc_id" jdbcType="VARCHAR" property="rsc_id" />
 		<result column="rsc_name" jdbcType="VARCHAR" property="rsc_name" />
+		<result column="rsc_array" jdbcType="VARCHAR" property="rsc_array" />
 		<result column="rsc_type" jdbcType="INTEGER" property="rsc_type" />
 		<result column="rsc_sort" jdbcType="INTEGER" property="rsc_sort" />
 		<result column="rsc_remark" jdbcType="VARCHAR" property="rsc_remark" />
-		<result column="rsc_conversion" jdbcType="INTEGER" property="rsc_conversion" />
-		<result column="rsc_order" jdbcType="VARCHAR" property="rsc_order" />
+        <result column="is_active" jdbcType="VARCHAR" property="is_active" />
+        <result column="create_date" jdbcType="DATE" property="create_date" />
+		<result column="modify_date" jdbcType="DATE" property="modify_date" />
 	</resultMap>
 
 	<select id="selectAll" resultMap="BaseResultMap">
 		select * from rs_column_conf
 		order by
-		id
+		sn_id
 	</select>
 
 	<select id="selectByTableIdAndType" resultMap="BaseResultMap">
 		select * from
 		rs_column_conf where
 		rs_t_id = #{rs_t_id}
-		and rsc_category =
-		#{rsc_category}
-		order by id
+		and rsc_type in
+		<foreach collection="type_ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		order by sn_id
 	</select>
 
 	<select id="selectByTableId" resultMap="BaseResultMap">
 		select * from
 		rs_column_conf where
 		rs_t_id = #{rs_t_id}
-		order by id
+		order by sn_id
 	</select>
 
 	<select id="selectIdsByTableId" resultType="String">
 		select id from
 		rs_column_conf where
 		rs_t_id = #{rs_t_id}
-		order by id
+		order by sn_id
 	</select>
 	
 	<select id="selectIdsByTableIds" resultType="String">
@@ -53,14 +59,14 @@
 			separator="," close=")">
 			#{item}
 		</foreach>
-		order by id
+		order by sn_id
 	</select>
 
 	<select id="selectOneById" resultMap="BaseResultMap">
 		select * from
 		rs_column_conf where
 		id = #{id}
-		order by id
+		order by sn_id
 	</select>
 
 	<select id="selectByIds" resultMap="BaseResultMap">
@@ -71,14 +77,14 @@
 			separator="," close=")">
 			#{item}
 		</foreach>
-		order by id
+		order by sn_id
 	</select>
 
 	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsColumnConf"
 		useGeneratedKeys="true" keyProperty="id">
 		insert into
 		rs_column_conf
-		(rs_t_id,rsc_display,rsc_name,rsc_type,rsc_category,is_calc)
-		values(#{rs_t_id},#{rsc_display},#{rsc_name},#{rsc_type},#{rsc_category},#{is_calc})
+		(id,rs_t_id,rsc_display,rsc_formatter,rsc_id,rsc_name,rsc_array,rsc_type,rsc_sort,rsc_remark,is_calc)
+		values(#{id},#{rs_t_id},#{rsc_display},#{rsc_formatter},#{rsc_id},#{rsc_name},#{rsc_array},#{rsc_type},#{rsc_sort},#{rsc_remark},#{is_calc})
 	</insert>
 </mapper>

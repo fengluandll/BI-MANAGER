@@ -10,36 +10,40 @@ public class RsTableConf implements Serializable {
 	 */
 	private static final long serialVersionUID = -6272605384834358069L;
 
-	private Integer id;
+	private Integer sn_id; // 流水号id
 
-	private Integer ds_id;
+	private String id; // 唯一键id 传过来的
 
-	private String ds_name;
+	private String ds_name; // 表名
 
-	private String ds_display;
+	private String ds_display; // 表中文名
 
 	private Integer ds_type;// table 数据集类型 1 标准 2自定义
 
+	private String column_array; // 自定义数据集刷字段的
+
 	private String logic; // table 里的sql
+
+	private String is_active; // 自定义数据集字段 是否可用 Y可用 N删除
 
 	private Date create_date;
 
 	private Date modify_date;
 
-	public Integer getId() {
+	public Integer getSn_id() {
+		return sn_id;
+	}
+
+	public void setSn_id(Integer sn_id) {
+		this.sn_id = sn_id;
+	}
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
-	}
-
-	public Integer getDs_id() {
-		return ds_id;
-	}
-
-	public void setDs_id(Integer ds_id) {
-		this.ds_id = ds_id;
 	}
 
 	public String getDs_name() {
@@ -66,12 +70,28 @@ public class RsTableConf implements Serializable {
 		this.ds_type = ds_type;
 	}
 
+	public String getColumn_array() {
+		return column_array;
+	}
+
+	public void setColumn_array(String column_array) {
+		this.column_array = column_array;
+	}
+
 	public String getLogic() {
 		return logic;
 	}
 
 	public void setLogic(String logic) {
 		this.logic = logic;
+	}
+
+	public String getIs_active() {
+		return is_active;
+	}
+
+	public void setIs_active(String is_active) {
+		this.is_active = is_active;
 	}
 
 	public Date getCreate_date() {
@@ -89,5 +109,4 @@ public class RsTableConf implements Serializable {
 	public void setModify_date(Date modify_date) {
 		this.modify_date = modify_date;
 	}
-
 }

@@ -2,8 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zhisiyun.bi.defaultDao.MchartsMapper">
 	<resultMap id="BaseResultMap" type="com.zhisiyun.bi.bean.defaultBean.Mcharts">
-		<id column="id" jdbcType="INTEGER" property="id" />
-		<result column="dashboard_id" jdbcType="INTEGER" property="dashboard_id" />
+		<id column="sn_id" jdbcType="INTEGER" property="sn_id" />
+		<result column="id" jdbcType="VARCHAR" property="id" />
+		<result column="dashboard_id" jdbcType="VARCHAR" property="dashboard_id" />
 		<result column="name" jdbcType="VARCHAR" property="name" />
 		<result column="config" jdbcType="VARCHAR" property="config" />
 		<result column="create_date" jdbcType="DATE" property="create_date" />
@@ -21,6 +22,17 @@
 		= #{id} and dashboard_id = #{dashboard_id}
 		order by id
 	</select>
+	
+	<select id="selectOneBySnId" resultMap="BaseResultMap">
+		select * from m_charts where
+	    sn_id = #{sn_id}
+	</select>
+	
+	<select id="selectSearchByBoardId" resultMap="BaseResultMap">
+		select * from m_charts where
+		dashboard_id = #{dashboard_id}
+		and mc_type = 11
+	</select>
 
 	<select id="selectOneById" resultMap="BaseResultMap">
 		select * from m_charts
@@ -36,10 +48,16 @@
 		order by id
 	</select>
 
-	<update id="updateById">
-		update m_charts set name = #{name},config = #{config}
+	<update id="updateById" parameterType="com.zhisiyun.bi.bean.defaultBean.Mcharts" >
+		update m_charts set name = #{name},mc_type = #{mc_type},config = #{config}
 		where id =
 		#{id}
+	</update>
+	
+	<update id="updateBySnId">
+		update m_charts set id = #{id},is_active= #{is_active}
+		where sn_id =
+		#{sn_id}
 	</update>
 
 	<insert id="newChart">
@@ -61,10 +79,10 @@
 	</insert>
 
 	<insert id="newChartByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.Mcharts"
-		useGeneratedKeys="true" keyProperty="id">
+		useGeneratedKeys="true" keyProperty="sn_id">
 		insert into m_charts
-		(dashboard_id,name,config)
-		values(#{dashboard_id},#{name},#{config})
+		(id,dashboard_id,name,mc_type,config,is_active)
+		values(#{id},#{dashboard_id},#{name},#{mc_type},#{config},#{is_active})
 	</insert>
 
 	<delete id="deleteChart">
@@ -72,5 +90,10 @@
 		where id = #{id}
 		and dashboard_id
 		= #{dashboard_id}
+	</delete>
+	
+	<delete id="deleteChartBySnId">
+		delete from m_charts
+		where sn_id = #{sn_id}
 	</delete>
 </mapper>

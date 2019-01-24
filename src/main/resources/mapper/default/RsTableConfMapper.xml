@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zhisiyun.bi.defaultDao.RsTableConfMapper">
 	<resultMap id="BaseResultMap" type="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
-		<id column="id" jdbcType="INTEGER" property="id" />
-		<id column="ds_id" jdbcType="INTEGER" property="ds_id" />
+	    <id column="sn_id" jdbcType="INTEGER" property="sn_id" />
+		<result column="id" jdbcType="VARCHAR" property="id" />
 		<result column="ds_name" jdbcType="VARCHAR" property="ds_name" />
 		<result column="ds_display" jdbcType="VARCHAR" property="ds_display" />
 		<result column="ds_type" jdbcType="INTEGER" property="ds_type" />
@@ -22,14 +22,17 @@
 		select * from rs_table_conf
 		where ds_name = #{ds_name}
 		order by
-		id
+		sn_id
 	</select>
 
 	<select id="selectById" resultMap="BaseResultMap">
 		select * from rs_table_conf
 		where id = #{id}
-		order by
-		id
+	</select>
+	
+	<select id="selectByDsName" resultMap="BaseResultMap">
+		select * from rs_table_conf
+		where ds_name = #{ds_name}
 	</select>
 
 	<select id="selectByNameOrDisplay" resultMap="BaseResultMap">
@@ -44,19 +47,18 @@
 	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf"
 	useGeneratedKeys="true" keyProperty="id">
 		insert into
-		rs_table_conf(ds_id,ds_name,ds_display)
-		values(#{ds_id},#{ds_name},#{ds_display})
+		rs_table_conf(id,ds_name,ds_display)
+		values(#{id},#{ds_name},#{ds_display})
 	</insert>
 	<insert id="addDiyByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf"
-		useGeneratedKeys="true" keyProperty="id">
+		useGeneratedKeys="true" keyProperty="sn_id">
 		insert into
-		rs_table_conf(ds_name,ds_display,ds_type,logic)
-		values(#{ds_name},#{ds_display},#{ds_type},#{logic})
+		rs_table_conf(id,ds_name,ds_display,ds_type,logic,column_array)
+		values(#{id},#{ds_name},#{ds_display},#{ds_type},#{logic},#{column_array})
 	</insert>
 	<update id="updateByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
 		update rs_table_conf
 		<set>
-			ds_id = #{ds_id},
 			ds_name
 			= #{ds_name},
 			ds_display = #{ds_display}
@@ -73,13 +75,13 @@
 			#{item}
 		</foreach>
 		order by
-		id
+		sn_id
 	</select>
 	<select id="makeTableAndColumn" useCache="false" statementType="CALLABLE"
 		resultType="java.lang.Integer">  
         <![CDATA[ 
         select fnc_stru_analyse(
-        #{id,mode=IN,jdbcType=INTEGER});
+        #{sn_id,mode=IN,jdbcType=INTEGER});
         ]]>
 	</select>
 </mapper>

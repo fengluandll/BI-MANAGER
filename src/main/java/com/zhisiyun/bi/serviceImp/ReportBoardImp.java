@@ -376,7 +376,7 @@ public class ReportBoardImp {
 			List<String> cols = new ArrayList<>();
 			for (RsColumnConf rs : rsColumnConfList) {
 				// is_calc rsc_category 1维度 2度量
-				if (rs.getIs_calc().equals("N") && rs.getRsc_category().equals(2)) {
+				if (rs.getIs_calc().equals("N") ) {
 					cols.add(" sum(" + rs.getRsc_name() + ") as " + rs.getRsc_display());
 				} else {
 					cols.add(rs.getRsc_name() + " as " + rs.getRsc_display());
@@ -419,7 +419,7 @@ public class ReportBoardImp {
 			if (rsColumnConfList != null && rsColumnConfList.size() > 0) {
 				List<String> groupBy = new ArrayList<>();
 				for (RsColumnConf col : rsColumnConfList) {
-					if (col.getRsc_category().equals(1)) {// 只有维度可以group by 20181122
+					if ("".equals("判断是维度")) {// 只有维度可以group by 20181122
 						groupBy.add(col.getRsc_name());
 					}
 				}
@@ -454,11 +454,6 @@ public class ReportBoardImp {
 						rsColumnConf = meaMap.get(header);
 						val = m.get(header);
 						if (val != null && rsColumnConf != null && rsColumnConf.getRsc_type() == 1) {
-							// 是否存在单位换算值
-							if (rsColumnConf.getRsc_conversion() != null) {
-								val = new BigDecimal(String.valueOf(val))
-										.multiply(new BigDecimal(rsColumnConf.getRsc_conversion()));
-							}
 							// 是否存在数值格式化公式
 							if (StringUtils.isNotEmpty(rsColumnConf.getRsc_formatter())) {
 								val = new DecimalFormat(rsColumnConf.getRsc_formatter()).format(val);

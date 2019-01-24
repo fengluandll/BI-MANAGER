@@ -38,6 +38,7 @@ import com.zhisiyun.bi.serviceImp.LogDebugImp;
 import com.zhisiyun.bi.serviceImp.ReportBoardImp;
 import com.zhisiyun.bi.serviceImp.ReportBoardImpPro;
 import com.zhisiyun.bi.utils.CacheUtil;
+import com.zhisiyun.bi.utils.MD5Uitls;
 import com.zhisiyun.bi.utils.MchartsUtils;
 import com.zhisiyun.bi.utils.ReportUtils;
 
@@ -195,12 +196,12 @@ public class ReportBoardApi {
 					mDashboard = new Mdashboard();
 					mDashboard.setName(tDashboard.getName());
 					mDashboard.setStyle_config(tDashboard.getStyle_config());
-					mDashboard.setTemplate_id(Integer.parseInt(templateId));
+					mDashboard.setTemplate_id(templateId);
 					mDashboard.setGroup_id(client);
+					mDashboard.setId(MD5Uitls.getMD5Id(templateId+client)); // 设置唯一键 template_id+group_id
 					mdashboardMapper.addByBean(mDashboard);
-					Integer id = mDashboard.getId();
 					// 调用刷新内存
-					cacheUtil.refreshMDashboardone(id);
+					cacheUtil.refreshMDashboardone(MD5Uitls.getMD5Id(templateId+client));
 					// 重新取出
 					mDashboard = CacheUtil.mDashboard.get(templateId + client);
 				}
@@ -383,13 +384,13 @@ public class ReportBoardApi {
 			String style_config = dashboard.getJSONObject("style_config").toString();
 			// 判断userId是客户还是自己
 			if (dashboard_type.equals("customer")) {// 客户
-				mdashboardMapper.updateById(Integer.parseInt(id), style_config);
+				mdashboardMapper.updateById(id, style_config);
 				// 跟新完刷新缓存
-				cacheUtil.refreshMDashboardone(Integer.parseInt(id));
+				cacheUtil.refreshMDashboardone(id);
 			} else if (dashboard_type.equals("self")) {// 自己
-				tdashboardMapper.updateById(Integer.parseInt(id), style_config);
+				tdashboardMapper.updateById(id, style_config);
 				// 跟新完刷新缓存
-				cacheUtil.refreshTDashboardone(Integer.parseInt(id));
+				cacheUtil.refreshTDashboardone(id);
 			}
 			rest.put("success", "success");
 		} catch (Exception e) {
@@ -443,7 +444,7 @@ public class ReportBoardApi {
 		JSONObject rest = new JSONObject();
 		try {
 			// 客户
-			Mdashboard mDashboard = mdashboardMapper.selectById(Integer.parseInt(id));
+			Mdashboard mDashboard = mdashboardMapper.selectById(id);
 			// 自己
 			Tdashboard tDashboard = tdashboardMapper.selectById(mDashboard.getTemplate_id());
 			// 取出 tDashboard中key的值
@@ -480,9 +481,9 @@ public class ReportBoardApi {
 				children_m.put(keys.get(i), children_t.getJSONObject(keys.get(i)));
 			}
 			String style_config_save = obj_m.toString();
-			mdashboardMapper.updateById(Integer.parseInt(id), style_config_save);// 数据库更新
+			mdashboardMapper.updateById(id, style_config_save);// 数据库更新
 			// 跟新完刷新缓存
-			cacheUtil.refreshMDashboardone(Integer.parseInt(id));
+			cacheUtil.refreshMDashboardone(id);
 			rest.put("success", "true");
 		} catch (Exception e) {
 			rest.put("success", "false");

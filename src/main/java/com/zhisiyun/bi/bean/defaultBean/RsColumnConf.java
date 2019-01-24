@@ -1,6 +1,7 @@
 package com.zhisiyun.bi.bean.defaultBean;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class RsColumnConf implements Serializable {
 
@@ -9,45 +10,62 @@ public class RsColumnConf implements Serializable {
 	 */
 	private static final long serialVersionUID = 8806299147987958826L;
 
-	private Integer id; // 字段column id
+	private Integer sn_id; // 流水号id
 
-	private Integer rs_t_id; // table id
+	private String id; // 唯一键id;同步的拉过来,本地的rs_t_id+rsc_name
 
-	private String is_calc; // 是否计算字段
+	private String rs_t_id; // table id
 
-	private Integer rsc_category; // 种类 维度 和 度量
+	private String is_calc; // 是否计算字段;自己创建的就是Y
 
 	private String rsc_display; // 展示名称
 
 	private String rsc_formatter; // 格式化
 
+	private String rsc_id; // 字段的Id用来关联用的
+
 	private String rsc_name; // 字段
 
-	private Integer rsc_type; // 字段类型 1数字 2字符 3时间
+	private String rsc_array; // 字段的原始字段
+
+	/***
+	 * "dim_t:时间维度 dim_o:组织维度 dim_n:普通维度 dim_b:布尔维度（只有固定值Y/N） num_n:普通度量（不可聚合）
+	 * num_c:计算度量（可以聚合） str:属性（只能用来显示，不能用来分析） dim是维度，可用来筛选关联。 num是度量，可用来计算。
+	 * str是属性，只能用来显示。"
+	 ***/
+	private Integer rsc_type; // 字段类型 1时间类型2组织类型3普通类型4布尔类型   ; 11:num_n普通度量类型12num_c计算度量类型 21:str属性只能用来显示不能用来关联查询
 
 	private Integer rsc_sort; // 排序
 
 	private String rsc_remark; // 备注
 
-	private Integer rsc_conversion; // ???
+	private String is_active; // 自定义数据集字段 是否可用 Y可用 N删除
 
-	private String rsc_order; // 排序
+	private Date create_date;
 
-	private String bl_active; // 自定义数据集字段 是否可用 Y可用 N删除
+	private Date modify_date;
 
-	public Integer getId() {
+	public Integer getSn_id() {
+		return sn_id;
+	}
+
+	public void setSn_id(Integer sn_id) {
+		this.sn_id = sn_id;
+	}
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public Integer getRs_t_id() {
+	public String getRs_t_id() {
 		return rs_t_id;
 	}
 
-	public void setRs_t_id(Integer rs_t_id) {
+	public void setRs_t_id(String rs_t_id) {
 		this.rs_t_id = rs_t_id;
 	}
 
@@ -57,14 +75,6 @@ public class RsColumnConf implements Serializable {
 
 	public void setIs_calc(String is_calc) {
 		this.is_calc = is_calc;
-	}
-
-	public Integer getRsc_category() {
-		return rsc_category;
-	}
-
-	public void setRsc_category(Integer rsc_category) {
-		this.rsc_category = rsc_category;
 	}
 
 	public String getRsc_display() {
@@ -83,12 +93,28 @@ public class RsColumnConf implements Serializable {
 		this.rsc_formatter = rsc_formatter;
 	}
 
+	public String getRsc_id() {
+		return rsc_id;
+	}
+
+	public void setRsc_id(String rsc_id) {
+		this.rsc_id = rsc_id;
+	}
+
 	public String getRsc_name() {
 		return rsc_name;
 	}
 
 	public void setRsc_name(String rsc_name) {
 		this.rsc_name = rsc_name;
+	}
+
+	public String getRsc_array() {
+		return rsc_array;
+	}
+
+	public void setRsc_array(String rsc_array) {
+		this.rsc_array = rsc_array;
 	}
 
 	public Integer getRsc_type() {
@@ -115,28 +141,27 @@ public class RsColumnConf implements Serializable {
 		this.rsc_remark = rsc_remark;
 	}
 
-	public Integer getRsc_conversion() {
-		return rsc_conversion;
+	public String getIs_active() {
+		return is_active;
 	}
 
-	public void setRsc_conversion(Integer rsc_conversion) {
-		this.rsc_conversion = rsc_conversion;
+	public void setIs_active(String is_active) {
+		this.is_active = is_active;
 	}
 
-	public String getRsc_order() {
-		return rsc_order;
+	public Date getCreate_date() {
+		return create_date;
 	}
 
-	public void setRsc_order(String rsc_order) {
-		this.rsc_order = rsc_order;
+	public void setCreate_date(Date create_date) {
+		this.create_date = create_date;
 	}
 
-	public String getBl_active() {
-		return bl_active;
+	public Date getModify_date() {
+		return modify_date;
 	}
 
-	public void setBl_active(String bl_active) {
-		this.bl_active = bl_active;
+	public void setModify_date(Date modify_date) {
+		this.modify_date = modify_date;
 	}
-
 }

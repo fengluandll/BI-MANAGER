@@ -2,12 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zhisiyun.bi.defaultDao.MdashboardMapper">
 	<resultMap id="BaseResultMap" type="com.zhisiyun.bi.bean.defaultBean.Mdashboard">
-		<id column="id" jdbcType="INTEGER" property="id" />
+		<id column="sn_id" jdbcType="INTEGER" property="sn_id" />
+		<result column="id" jdbcType="VARCHAR" property="id" />
 		<result column="name" jdbcType="VARCHAR" property="name" />
 		<result column="style_config" jdbcType="VARCHAR" property="style_config" />
 		<result column="create_date" jdbcType="DATE" property="create_date" />
 		<result column="modify_date" jdbcType="DATE" property="modify_date" />
-		<result column="template_id" jdbcType="INTEGER" property="template_id" />
+		<result column="template_id" jdbcType="VARCHAR" property="template_id" />
 		<result column="group_id" jdbcType="VARCHAR" property="group_id" />
 		<result column="privilege" jdbcType="VARCHAR" property="privilege" />
 	</resultMap>
@@ -37,10 +38,10 @@
 	</insert>
 
 	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.Mdashboard"
-		useGeneratedKeys="true" keyProperty="id">
+		useGeneratedKeys="true" keyProperty="sn_id">
 		insert into
-		m_dashboard(name,style_config,template_id,group_id)
-		values(#{name},#{style_config},#{template_id},#{group_id})
+		m_dashboard(id,name,style_config,template_id,group_id)
+		values(#{id},#{name},#{style_config},#{template_id},#{group_id})
 	</insert>
 
 </mapper>

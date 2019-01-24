@@ -65,32 +65,32 @@ public class EditChartsController {
 	 * @serialData 20180913
 	 **/
 	@RequestMapping("/chart")
-	public ModelAndView index(Model model, String id, String dashboardId) throws Exception {
+	public ModelAndView index(Model model, String sn_id, String dashboardId) throws Exception {
 		List<Mcharts> mChartsList = null;
 		Mcharts mCharts = null;
 		Tdashboard tdashboard = null;
 		List<RsTableConf> rsTableConfList = null;
 		try {
 			// 请求 dashboard 获取一共有多少个 组件
-			mChartsList = mChartsMapper.selectById(Integer.parseInt(dashboardId));
+			mChartsList = mChartsMapper.selectById(dashboardId);
 			// 请求对应的 组件 数据
-			mCharts = mChartsMapper.selectOne(Integer.parseInt(id), Integer.parseInt(dashboardId));
+			mCharts = mChartsMapper.selectOneBySnId(Integer.parseInt(sn_id));
 			// dashboard
-			tdashboard = tDashboardMapper.selectById(Integer.parseInt(dashboardId));
+			tdashboard = tDashboardMapper.selectById(dashboardId);
 			// 查询 数据集(根据dashboard中配置的查询)
 			String style_config_str = tdashboard.getStyle_config();
 			JSONObject obj = JSON.parseObject(style_config_str);
 			JSONArray dataSet = obj.getJSONArray("dataSet");
-			List<Integer> idList = new ArrayList<Integer>(); // rs_table_config 的 id list
+			List<String> idList = new ArrayList<String>(); // rs_table_config 的 id list
 			for (int i = 0; i < dataSet.size(); i++) {
-				idList.add(dataSet.getInteger(i));
+				idList.add(dataSet.getString(i).toString());
 			}
 			rsTableConfList = rsTableConfMapper.selectByIdList(idList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		ModelAndView view = new ModelAndView();
-		model.addAttribute("id", id);
+		model.addAttribute("id", mCharts.getId());
 		model.addAttribute("dashboardId", dashboardId);
 		model.addAttribute("mChartsList", mChartsList);
 		model.addAttribute("rsTableConfList", rsTableConfList);
@@ -102,11 +102,14 @@ public class EditChartsController {
 		// 0 1 2 3 图表 4 table 5 search
 		String config = mCharts.getConfig();
 		JSONObject obj = JSON.parseObject(config);
+		/***
+		 * 
+		 * ***/
 		String type = obj.getString("type");
 		if ("0".equals(type) || "1".equals(type) || "2".equals(type)) {
 			view.setViewName("mCharts/editCharts");
 		}
-		if ("3".equals(type) || "5".equals(type)) {
+		if ("3".equals(type) || "5".equals(type) || "7".equals(type)) {
 			view.setViewName("mCharts/editTable");
 		}
 		if ("4".equals(type)) {
@@ -133,12 +136,21 @@ public class EditChartsController {
 		ModelAndView view = new ModelAndView();
 		view.setViewName("mCharts/chartColumn");
 		try {
+			List<String> type_ids = new ArrayList<String>();// 维度度量类型
 			// 获取 rs_t_id
 			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
-			// 维度 rsc_category = 1
-			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableIdAndType(rsTableConf.getId(), 1);
-			// 度量 rsc_category = 2
-			List<RsColumnConf> measure = rsColumnConfMapper.selectByTableIdAndType(rsTableConf.getId(), 2);
+			// 维度 
+			type_ids.add("1");
+			type_ids.add("2");
+			type_ids.add("3");
+			type_ids.add("4");
+			type_ids.add("21");
+			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableIdAndType(rsTableConf.getId(), type_ids);
+			// 度量 
+			type_ids = new ArrayList<String>();
+			type_ids.add("11");
+			type_ids.add("12");
+			List<RsColumnConf> measure = rsColumnConfMapper.selectByTableIdAndType(rsTableConf.getId(), type_ids);
 			model.addAttribute("dimension", dimension);
 			model.addAttribute("measure", measure);
 			model.addAttribute("rsTableConf", rsTableConf);
@@ -156,15 +168,13 @@ public class EditChartsController {
 	 *            数据集table 名称
 	 **/
 	@RequestMapping("/tableColumn")
-	public ModelAndView tableColumn(Model model, String ds_name,String type) throws Exception {
+	public ModelAndView tableColumn(Model model, String ds_name, String type) throws Exception {
 		ModelAndView view = new ModelAndView();
 		view.setViewName("mCharts/tableColumn");
 		try {
 			// 获取 rs_t_id
 			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
-			// 维度 rsc_category = 1
 			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
-			BaseBean baseBean = new BaseBean();
 			model.addAttribute("dimension", dimension);
 			model.addAttribute("rsTableConf", rsTableConf);
 			model.addAttribute("type", type);
@@ -188,7 +198,6 @@ public class EditChartsController {
 		try {
 			// 获取 rs_t_id
 			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
-			// 维度 rsc_category = 1
 			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
 			model.addAttribute("dimension", dimension);
 			model.addAttribute("rsTableConf", rsTableConf);
@@ -212,7 +221,6 @@ public class EditChartsController {
 		try {
 			// 获取 rs_t_id
 			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
-			// 维度 rsc_category = 1
 			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
 			model.addAttribute("dimension", dimension);
 			model.addAttribute("rsTableConf", rsTableConf);

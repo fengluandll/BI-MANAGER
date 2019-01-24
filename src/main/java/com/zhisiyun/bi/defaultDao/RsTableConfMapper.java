@@ -12,7 +12,9 @@ public interface RsTableConfMapper {
 
 	List<RsTableConf> selectByName(@Param("ds_name") String ds_name);
 
-	RsTableConf selectById(@Param("id") Integer id);
+	RsTableConf selectById(@Param("id") String id);
+	
+	RsTableConf selectByDsName(@Param("ds_name") String ds_name);
 
 	List<RsTableConf> selectByNameOrDisplay(@Param("ds_name") String ds_name);
 
@@ -22,8 +24,8 @@ public interface RsTableConfMapper {
 
 	int updateByBean(RsTableConf rsTableConf);
 
-	List<RsTableConf> selectByIdList(@Param("idList") List<Integer> idList);
+	List<RsTableConf> selectByIdList(@Param("idList") List<String> idList);
 
-	int makeTableAndColumn(@Param("id") Integer id);
+	int makeTableAndColumn(@Param("sn_id") Integer sn_id);
 
 }

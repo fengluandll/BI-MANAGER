@@ -12,32 +12,45 @@ public class Mcharts implements Serializable {
 	 */
 	private static final long serialVersionUID = 3927821298264635207L;
 
-	private Integer id;
+	private Integer sn_id; // 流水号Id
 
-	private Integer dashboard_id;
+	private String id; // t_dashboard id+config计算md5
 
-	private String name;
+	private String dashboard_id; // 属于的t_dashboard id
 
-	// 组件配置信息 Json
-	private String config;
+	private String name; // 名称
+
+	private Integer mc_type; // mcahrts类型
+
+	private String config; // 组件配置信息 Json
+
+	private String is_active; // 自定义数据集字段 是否可用 Y可用 N删除
 
 	private Date create_date;
 
 	private Date modify_date;
 
-	public Integer getId() {
+	public Integer getSn_id() {
+		return sn_id;
+	}
+
+	public void setSn_id(Integer sn_id) {
+		this.sn_id = sn_id;
+	}
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public Integer getDashboard_id() {
+	public String getDashboard_id() {
 		return dashboard_id;
 	}
 
-	public void setDashboard_id(Integer dashboard_id) {
+	public void setDashboard_id(String dashboard_id) {
 		this.dashboard_id = dashboard_id;
 	}
 
@@ -49,12 +62,28 @@ public class Mcharts implements Serializable {
 		this.name = name;
 	}
 
+	public Integer getMc_type() {
+		return mc_type;
+	}
+
+	public void setMc_type(Integer mc_type) {
+		this.mc_type = mc_type;
+	}
+
 	public String getConfig() {
 		return config;
 	}
 
 	public void setConfig(String config) {
 		this.config = config;
+	}
+
+	public String getIs_active() {
+		return is_active;
+	}
+
+	public void setIs_active(String is_active) {
+		this.is_active = is_active;
 	}
 
 	public Date getCreate_date() {
@@ -72,5 +101,4 @@ public class Mcharts implements Serializable {
 	public void setModify_date(Date modify_date) {
 		this.modify_date = modify_date;
 	}
-
 }

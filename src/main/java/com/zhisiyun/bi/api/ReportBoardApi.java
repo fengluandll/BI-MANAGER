@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhisiyun.bi.bean.defaultBean.Mcharts;
 import com.zhisiyun.bi.bean.defaultBean.Mdashboard;
@@ -230,39 +229,6 @@ public class ReportBoardApi {
 		return rest.toJSONString();
 	}
 
-	/**
-	 * reportBoard 第一次查询所有的数据
-	 * 
-	 * @param boardId就是reportid
-	 * 
-	 * @param activeName
-	 *            children里子报表的name
-	 * 
-	 * 
-	 * @return
-	 */
-	@RequestMapping(value = "/fetchData", method = RequestMethod.POST)
-	public String fetchData(String params) {
-		JSONObject object = JSON.parseObject(params);
-		JSONObject rest = new JSONObject();
-		try {
-			// 根据 boardId(reportId) 取出RsReport
-			String boardId = object.getString("boardId");
-			Mdashboard dashboard = JSON.parseObject(object.getJSONObject("mDashboard").toString(), Mdashboard.class);
-			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
-			// 图表 数据查询
-			Map<String, Object> dataList = new HashMap<String, Object>();
-			dataList = reportBoardImp.getAllDate(dashboard, rsReport);
-			rest.put("dataList", dataList);
-			rest.put("success", "success");
-		} catch (Exception e) {
-			rest.put("success", "false");
-			e.printStackTrace();
-			log.error(e.getMessage(), e);
-		}
-		return rest.toJSONString();
-	}
-
 	@RequestMapping(value = "/fetchEdit", method = RequestMethod.POST)
 	public Map<String, Object> fetchEdit(String boardId) {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -293,48 +259,6 @@ public class ReportBoardApi {
 			log.error(e.getMessage(), e);
 		}
 		return map;
-	}
-
-	/**
-	 * @图表关联请求数据
-	 * @点击搜索框请求数据
-	 * 
-	 * @props fatherId
-	 * @props chartName 关联图表uuuid
-	 * @props columnId 关联的字段id
-	 * @props value 参数值
-	 * 
-	 * @serialData 20180927
-	 * @author wangliu
-	 * 
-	 */
-	@RequestMapping(value = "/searchDate", method = RequestMethod.POST)
-	public String searchDate(String params) {
-		JSONObject object = JSON.parseObject(params);
-		JSONObject rest = new JSONObject();
-		// 图表数据集合
-		Map<String, Object> dataList = new HashMap<String, Object>();
-		try {
-			Mdashboard dashboard = JSON.parseObject(object.getJSONObject("mDashboard").toString(), Mdashboard.class);
-			String boardId = object.getString("boardId");
-			// 根据 boardId(reportId) 取出RsReport
-			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
-			JSONArray valueArray = object.getJSONArray("value");
-			String[] value = new String[3];
-			if (null != valueArray && valueArray.size() > 1) {
-				value[0] = valueArray.getString(0);// 图表维度的字段 id
-				value[1] = valueArray.getString(1);// 值
-				value[2] = valueArray.getString(2);// 图表的名称(mchart表id)
-			}
-			// 请求search数据
-			dataList = reportBoardImp.getSearchDate(dashboard, value, rsReport);
-			rest.put("dataList", dataList);
-		} catch (Exception e) {
-			rest.put("success", "false");
-			e.printStackTrace();
-			log.error(e.getMessage(), e);
-		}
-		return rest.toJSONString();
 	}
 
 	/***

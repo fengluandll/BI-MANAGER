@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import com.zhisiyun.bi.serviceImp.LogDebugImp;
 import com.zhisiyun.bi.serviceImp.ReportBoardImp;
 import com.zhisiyun.bi.serviceImp.ReportBoardImpPro;
 import com.zhisiyun.bi.utils.CacheUtil;
+import com.zhisiyun.bi.utils.ExcelUtils;
 import com.zhisiyun.bi.utils.MD5Uitls;
 import com.zhisiyun.bi.utils.MchartsUtils;
 import com.zhisiyun.bi.utils.ReportUtils;
@@ -197,10 +199,10 @@ public class ReportBoardApi {
 					mDashboard.setStyle_config(tDashboard.getStyle_config());
 					mDashboard.setTemplate_id(templateId);
 					mDashboard.setGroup_id(client);
-					mDashboard.setId(MD5Uitls.getMD5Id(templateId+client)); // 设置唯一键 template_id+group_id
+					mDashboard.setId(MD5Uitls.getMD5Id(templateId + client)); // 设置唯一键 template_id+group_id
 					mdashboardMapper.addByBean(mDashboard);
 					// 调用刷新内存
-					cacheUtil.refreshMDashboardone(MD5Uitls.getMD5Id(templateId+client));
+					cacheUtil.refreshMDashboardone(MD5Uitls.getMD5Id(templateId + client));
 					// 重新取出
 					mDashboard = CacheUtil.mDashboard.get(templateId + client);
 				}
@@ -243,7 +245,7 @@ public class ReportBoardApi {
 				String config = mchart.getConfig();
 				JSONObject object = JSON.parseObject(config);
 				String dataSetName = object.getString("dataSetName");
-				if (null!=dataSetName&&!sameDataSetName.contains(dataSetName)) {
+				if (null != dataSetName && !sameDataSetName.contains(dataSetName)) {
 					RsTableConf rsTableConf = rsTableConfMapper.selectByName(dataSetName).get(0);
 					List<RsColumnConf> tableIdColumn = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
 					tableIdColumns.put(dataSetName, tableIdColumn);
@@ -286,6 +288,37 @@ public class ReportBoardApi {
 			log.error(e.getMessage(), e);
 		}
 		return map;
+	}
+
+	/***
+	 * 交叉表导出excel
+	 * 
+	 ***/
+	@RequestMapping(value = "/exportTableExcel", method = RequestMethod.POST)
+	public void exportTableExcel(HttpServletResponse response, String params) {
+		try {
+			// 图表数据集合
+			Map<String, Object> dataList = new HashMap<String, Object>();
+			JSONObject object = JSON.parseObject(params);
+			String param = object.getString("params");
+			// 取出传过来的参数
+			SearchBean searchBean = JSON.parseObject(param, SearchBean.class);
+			// 根据 boardId(reportId) 取出RsReport
+			RsReport rsReport = rsReportMapper.selectByReportId(searchBean.getReport_id());
+			// 请求search数据
+			dataList = reportBoardImpPro.search(rsReport, searchBean);
+			Map<String, Object> map = new HashMap<>(); // 交叉表table的数据
+			for (Map.Entry<String, Object> m : dataList.entrySet()) {
+				map = (Map<String, Object>) m.getValue();
+			}
+			// 取出dataList中的交叉表数据并导出excel
+			List<String> header = (List<String>) map.get("header");
+			List body = (List) map.get("body");
+			ExcelUtils.export(response, header, body);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**

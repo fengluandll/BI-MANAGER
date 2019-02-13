@@ -27,7 +27,6 @@ import com.zhisiyun.bi.defaultDao.MchartsMapper;
 import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.utils.CacheUtil;
-import com.zhisiyun.bi.utils.DashboardUtils;
 import com.zhisiyun.bi.utils.MD5Uitls;
 import com.zhisiyun.bi.utils.SqlUtils;
 
@@ -49,9 +48,6 @@ public class EditChartsApi {
 
 	@Autowired
 	CacheUtil cacheUtil;
-
-	@Autowired
-	DashboardUtils dashboardUtils;
 
 	private static Logger log = LoggerFactory.getLogger(ReportBoardApi.class);
 

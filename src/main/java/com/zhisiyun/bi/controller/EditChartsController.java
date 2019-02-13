@@ -183,6 +183,29 @@ public class EditChartsController {
 		}
 		return view;
 	}
+	
+	/**
+	 * @see 编辑table的 排序字段
+	 * @author wangliu
+	 * @serialData 20180920
+	 * @param ds_name
+	 *            数据集table 名称
+	 **/
+	@RequestMapping("/tableColumn_order")
+	public ModelAndView tableColumn_order(Model model, String ds_name) throws Exception {
+		ModelAndView view = new ModelAndView();
+		view.setViewName("mCharts/tableColumnOrder");
+		try {
+			// 获取 rs_t_id
+			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
+			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
+			model.addAttribute("dimension", dimension);
+			model.addAttribute("rsTableConf", rsTableConf);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return view;
+	}
 
 	/**
 	 * @see 编辑暴露字段

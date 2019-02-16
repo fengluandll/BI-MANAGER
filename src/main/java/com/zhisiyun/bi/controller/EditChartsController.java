@@ -121,6 +121,9 @@ public class EditChartsController {
 		if ("6".equals(type)) {
 			view.setViewName("mCharts/editText");
 		}
+		if("21".equals(type)) {
+			view.setViewName("mCharts/editAntdTable");
+		}
 		return view;
 	}
 

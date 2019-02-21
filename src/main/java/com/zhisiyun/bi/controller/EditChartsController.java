@@ -124,6 +124,9 @@ public class EditChartsController {
 		if("21".equals(type)) {
 			view.setViewName("mCharts/editAntdTable");
 		}
+		if("22".equals(type)) {
+			view.setViewName("mCharts/editPivotDiy");
+		}
 		return view;
 	}
 
@@ -204,6 +207,54 @@ public class EditChartsController {
 			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
 			model.addAttribute("dimension", dimension);
 			model.addAttribute("rsTableConf", rsTableConf);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return view;
+	}
+	
+	/**
+	 * @see 编辑table的 列
+	 * @author wangliu
+	 * @serialData 20180920
+	 * @param ds_name
+	 *            数据集table 名称
+	 **/
+	@RequestMapping("/tableColumnUrl")
+	public ModelAndView tableColumnUrl(Model model, String ds_name, String type) throws Exception {
+		ModelAndView view = new ModelAndView();
+		view.setViewName("mCharts/tableColumnUrl");
+		try {
+			// 获取 rs_t_id
+			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
+			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
+			model.addAttribute("dimension", dimension);
+			model.addAttribute("rsTableConf", rsTableConf);
+			model.addAttribute("type", type);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return view;
+	}
+	
+	/**
+	 * @see 编辑table的 列
+	 * @author wangliu
+	 * @serialData 20180920
+	 * @param ds_name
+	 *            数据集table 名称
+	 **/
+	@RequestMapping("/tableColumnFixed")
+	public ModelAndView tableColumnFixed(Model model, String ds_name, String type) throws Exception {
+		ModelAndView view = new ModelAndView();
+		view.setViewName("mCharts/tableColumnFixed");
+		try {
+			// 获取 rs_t_id
+			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
+			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
+			model.addAttribute("dimension", dimension);
+			model.addAttribute("rsTableConf", rsTableConf);
+			model.addAttribute("type", type);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

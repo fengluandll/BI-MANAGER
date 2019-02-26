@@ -14,7 +14,7 @@
 			<dd>
 				<ul>
 				    <li><a href="${request.contextPath}/tDashboard/list" title="主题列表">主题列表</a></li>
-				    <li><a href="${request.contextPath}/edit/chartsList" title="组件设计">组件设计</a></li>
+				    <!-- <li><a href="${request.contextPath}/edit/chartsList" title="组件设计">组件设计</a></li> -->
 				</ul>
 			</dd>
 		</dl>

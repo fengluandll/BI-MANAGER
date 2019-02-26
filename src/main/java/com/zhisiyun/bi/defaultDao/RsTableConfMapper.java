@@ -27,5 +27,7 @@ public interface RsTableConfMapper {
 	List<RsTableConf> selectByIdList(@Param("idList") List<String> idList);
 
 	int makeTableAndColumn(@Param("sn_id") Integer sn_id);
+	
+	int selectMaxSnId();
 
 }

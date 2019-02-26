@@ -240,17 +240,23 @@ public class ReportBoardApi {
 			List<Mcharts> mCharts = CacheUtil.mCharts.get(rsReport.getPage_id());
 			// 查询每个图表 所拥有的 数据集 的 所有字段 的表数据
 			JSONObject tableIdColumns = new JSONObject();
-			String sameDataSetName = "";
-			for (Mcharts mchart : mCharts) {
+			List<String> dataSetNameList = new ArrayList<String>(); // 数据集名称List
+			for (Mcharts mchart : mCharts) { // 循环是所有的图表找到他们的 数据集
 				String config = mchart.getConfig();
 				JSONObject object = JSON.parseObject(config);
 				String dataSetName = object.getString("dataSetName");
-				if (null != dataSetName && !sameDataSetName.contains(dataSetName)) {
+				Boolean flag = true;
+				for (String name : dataSetNameList) {
+					if (name.equals(dataSetName)) {
+						flag = false;
+					}
+				}
+				if (flag && null != dataSetName) { // 如果名称和之前的不重复就查询
+					dataSetNameList.add(dataSetName);
 					RsTableConf rsTableConf = rsTableConfMapper.selectByName(dataSetName).get(0);
 					List<RsColumnConf> tableIdColumn = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
 					tableIdColumns.put(dataSetName, tableIdColumn);
 				}
-				sameDataSetName = sameDataSetName + dataSetName;
 			}
 
 			map.put("tableIdColumns", tableIdColumns);
@@ -312,9 +318,11 @@ public class ReportBoardApi {
 				map = (Map<String, Object>) m.getValue();
 			}
 			// 取出dataList中的交叉表数据并导出excel
+			String chart_id = searchBean.getChildren().get(0).getChartId(); // 图表id
+			Mcharts mCharts = CacheUtil.mchart.get(chart_id);
 			List<String> header = (List<String>) map.get("header");
 			List body = (List) map.get("body");
-			ExcelUtils.export(response, header, body);
+			ExcelUtils.export(response, header, body, mCharts.getName());
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error(e.getMessage(), e);

@@ -34,14 +34,14 @@
 			separator="," close=")">
 			#{item}
 		</foreach>
-		order by sn_id
+		order by rsc_sort
 	</select>
 
 	<select id="selectByTableId" resultMap="BaseResultMap">
 		select * from
 		rs_column_conf where
 		rs_t_id = #{rs_t_id}
-		order by sn_id
+		order by rsc_sort
 	</select>
 
 	<select id="selectIdsByTableId" resultType="String">

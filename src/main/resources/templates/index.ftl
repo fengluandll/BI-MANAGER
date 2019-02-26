@@ -25,7 +25,13 @@
 <script type="text/javascript" src="lib/laypage/1.2/laypage.js"></script>
 <script type="text/javascript">
 
+// 初始化之后就跳转
+$(document).ready(function(){  
+     window.location.href="${request.contextPath}/tDashboard/list";
+});
+
 </script>
 <!--/请在上方写此页面业务相关的脚本-->
+
 </body>
 </html>

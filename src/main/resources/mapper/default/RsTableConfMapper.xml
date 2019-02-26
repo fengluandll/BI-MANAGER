@@ -84,4 +84,7 @@
         #{sn_id,mode=IN,jdbcType=INTEGER});
         ]]>
 	</select>
+	<select id="selectMaxSnId" resultType="Integer">
+		select max(sn_id) from rs_table_conf
+	</select>
 </mapper>

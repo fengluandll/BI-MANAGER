@@ -22,12 +22,14 @@ import com.zhisiyun.bi.bean.db.JTableResult;
 import com.zhisiyun.bi.bean.defaultBean.Mcharts;
 import com.zhisiyun.bi.bean.defaultBean.RsColumnConf;
 import com.zhisiyun.bi.bean.defaultBean.RsTableConf;
+import com.zhisiyun.bi.bean.defaultBean.Tdashboard;
 import com.zhisiyun.bi.defaultDao.JdbcDao;
 import com.zhisiyun.bi.defaultDao.MchartsMapper;
 import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.utils.CacheUtil;
 import com.zhisiyun.bi.utils.MD5Uitls;
+import com.zhisiyun.bi.utils.ReportUtils;
 import com.zhisiyun.bi.utils.SqlUtils;
 
 @RestController
@@ -48,6 +50,9 @@ public class EditChartsApi {
 
 	@Autowired
 	CacheUtil cacheUtil;
+
+	@Autowired
+	private ReportUtils reportUtils;
 
 	private static Logger log = LoggerFactory.getLogger(ReportBoardApi.class);
 
@@ -84,6 +89,33 @@ public class EditChartsApi {
 			e.printStackTrace();
 		}
 		return jTableResult;
+	}
+
+	/**
+	 * 新编辑后端，根据t_dashboard_id查询所有的mcharts
+	 * 
+	 * @param t_dashboard_id
+	 * 
+	 * @date 20190226
+	 * @return
+	 */
+	@RequestMapping(value = "/getMchartsList", method = RequestMethod.POST)
+	public Map<String, Object> getMchartsList(String t_dashboard_id) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Mcharts> chart_map = new HashMap<String, Mcharts>();
+		try {
+			List<Mcharts> chartList = mChartsMapper.selectById(t_dashboard_id);
+			for (Mcharts mcharts : chartList) {
+				chart_map.put(mcharts.getId(), mcharts);
+			}
+			Tdashboard tDashboard = CacheUtil.tDashboard.get(t_dashboard_id);
+			Map<String, Object> idColumns = reportUtils.getColumnsByDateSet(tDashboard);
+			map.put("idColumns", idColumns);
+			map.put("mChartsList", chart_map);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return map;
 	}
 
 	/************************************************************************************/
@@ -175,7 +207,7 @@ public class EditChartsApi {
 						name = "新建" + id + "text" + type;
 					} else if (type.equals("21")) {
 						name = "新建" + id + "antdtable" + type;
-					}else if (type.equals("22")) {
+					} else if (type.equals("22")) {
 						name = "新建" + id + "pivotDiy" + type;
 					} else if (type.equals("11")) {
 						name = "新建" + id + "Search" + type;

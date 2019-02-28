@@ -112,6 +112,7 @@ public class EditChartsApi {
 			Map<String, Object> idColumns = reportUtils.getColumnsByDateSet(tDashboard);
 			map.put("idColumns", idColumns);
 			map.put("mChartsList", chart_map);
+			map.put("tDashboard", tDashboard);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

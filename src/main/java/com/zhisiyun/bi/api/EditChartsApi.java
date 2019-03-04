@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhisiyun.bi.bean.db.DbParameters;
 import com.zhisiyun.bi.bean.db.JTableParam;
@@ -87,6 +88,7 @@ public class EditChartsApi {
 			jTableResult.setData(chartList);
 		} catch (Exception e) {
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return jTableResult;
 	}
@@ -110,11 +112,24 @@ public class EditChartsApi {
 			}
 			Tdashboard tDashboard = CacheUtil.tDashboard.get(t_dashboard_id);
 			Map<String, Object> idColumns = reportUtils.getColumnsByDateSet(tDashboard);
+			JSONObject style_config = JSON.parseObject(tDashboard.getStyle_config());
+			JSONArray dataSet = style_config.getJSONArray("dataSet");
+			Map<String, RsTableConf> dataSetList = new HashMap<String, RsTableConf>();
+			List<String> ids = new ArrayList<String>();
+			for(int i=0;i<dataSet.size();i++) {
+				ids.add(dataSet.getString(i));
+			}
+			List<RsTableConf> rsTableConfList = rsTableConfMapper.selectByIds(ids);
+			for (RsTableConf table : rsTableConfList) {
+				dataSetList.put(table.getDs_name(), table);
+			}
 			map.put("idColumns", idColumns);
 			map.put("mChartsList", chart_map);
 			map.put("tDashboard", tDashboard);
+			map.put("dataSetList", dataSetList);
 		} catch (Exception e) {
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return map;
 	}
@@ -165,6 +180,8 @@ public class EditChartsApi {
 			map.put("success", "success");
 		} catch (Exception e) {
 			map.put("success", "false");
+			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return map;
 	}
@@ -234,6 +251,7 @@ public class EditChartsApi {
 		} catch (Exception e) {
 			map.put("success", "false");
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return map;
 	}
@@ -257,6 +275,7 @@ public class EditChartsApi {
 		} catch (Exception e) {
 			map.put("success", "false");
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return map;
 	}
@@ -280,6 +299,7 @@ public class EditChartsApi {
 			map.put("list", rsColumnConfList);
 		} catch (Exception e) {
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return map;
 	}
@@ -308,6 +328,7 @@ public class EditChartsApi {
 			map.put("list", rsColumnConfList);
 		} catch (Exception e) {
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return map;
 	}
@@ -328,6 +349,7 @@ public class EditChartsApi {
 			map.put("rsColumnConf", rsColumnConf);
 		} catch (Exception e) {
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return map;
 	}
@@ -348,6 +370,7 @@ public class EditChartsApi {
 			map.put("sn_id", search.getSn_id());
 		} catch (Exception e) {
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return map;
 	}
@@ -370,6 +393,7 @@ public class EditChartsApi {
 			rest.put("mCharts", mCharts);
 		} catch (Exception e) {
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return rest.toJSONString();
 	}

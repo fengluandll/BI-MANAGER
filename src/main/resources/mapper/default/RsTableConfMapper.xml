@@ -30,6 +30,15 @@
 		where id = #{id}
 	</select>
 	
+	<select id="selectByIds" resultMap="BaseResultMap">
+		select * from rs_table_conf
+		where id in 
+		<foreach collection="ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
 	<select id="selectByDsName" resultMap="BaseResultMap">
 		select * from rs_table_conf
 		where ds_name = #{ds_name}

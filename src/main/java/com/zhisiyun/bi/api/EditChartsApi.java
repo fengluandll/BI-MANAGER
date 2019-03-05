@@ -1,12 +1,10 @@
 package com.zhisiyun.bi.api;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +22,12 @@ import com.zhisiyun.bi.bean.defaultBean.Mcharts;
 import com.zhisiyun.bi.bean.defaultBean.RsColumnConf;
 import com.zhisiyun.bi.bean.defaultBean.RsTableConf;
 import com.zhisiyun.bi.bean.defaultBean.Tdashboard;
-import com.zhisiyun.bi.defaultDao.JdbcDao;
 import com.zhisiyun.bi.defaultDao.MchartsMapper;
 import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.utils.CacheUtil;
 import com.zhisiyun.bi.utils.MD5Uitls;
 import com.zhisiyun.bi.utils.ReportUtils;
-import com.zhisiyun.bi.utils.SqlUtils;
 
 @RestController
 @RequestMapping("api/edit")
@@ -45,9 +41,6 @@ public class EditChartsApi {
 
 	@Autowired
 	private RsTableConfMapper rsTableConfMapper;
-
-	@Autowired
-	private JdbcDao jdbcDao;
 
 	@Autowired
 	CacheUtil cacheUtil;
@@ -91,47 +84,6 @@ public class EditChartsApi {
 			log.error(e.getMessage(), e);
 		}
 		return jTableResult;
-	}
-
-	/**
-	 * 新编辑后端，根据t_dashboard_id查询所有的mcharts
-	 * 
-	 * @param t_dashboard_id
-	 * 
-	 * @date 20190226
-	 * @return
-	 */
-	@RequestMapping(value = "/getMchartsList", method = RequestMethod.POST)
-	public Map<String, Object> getMchartsList(String t_dashboard_id) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		Map<String, Mcharts> chart_map = new HashMap<String, Mcharts>();
-		try {
-			List<Mcharts> chartList = mChartsMapper.selectById(t_dashboard_id);
-			for (Mcharts mcharts : chartList) {
-				chart_map.put(mcharts.getId(), mcharts);
-			}
-			Tdashboard tDashboard = CacheUtil.tDashboard.get(t_dashboard_id);
-			Map<String, Object> idColumns = reportUtils.getColumnsByDateSet(tDashboard);
-			JSONObject style_config = JSON.parseObject(tDashboard.getStyle_config());
-			JSONArray dataSet = style_config.getJSONArray("dataSet");
-			Map<String, RsTableConf> dataSetList = new HashMap<String, RsTableConf>();
-			List<String> ids = new ArrayList<String>();
-			for(int i=0;i<dataSet.size();i++) {
-				ids.add(dataSet.getString(i));
-			}
-			List<RsTableConf> rsTableConfList = rsTableConfMapper.selectByIds(ids);
-			for (RsTableConf table : rsTableConfList) {
-				dataSetList.put(table.getDs_name(), table);
-			}
-			map.put("idColumns", idColumns);
-			map.put("mChartsList", chart_map);
-			map.put("tDashboard", tDashboard);
-			map.put("dataSetList", dataSetList);
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.error(e.getMessage(), e);
-		}
-		return map;
 	}
 
 	/************************************************************************************/
@@ -398,129 +350,91 @@ public class EditChartsApi {
 		return rest.toJSONString();
 	}
 
-	/**
-	 * 请求 图表的 数据
-	 * 
-	 * @param chartId
-	 * @param json
-	 * @return
-	 */
-	@RequestMapping(value = "/findChartDate", method = RequestMethod.POST)
-	public String findChartDate(String chartId, String json) {
-		JSONObject rest = new JSONObject();
-		List list = new ArrayList();
-		try {
-			// 根据 chartId 查询出表 m_charts表
-			Mcharts mCharts = mChartsMapper.selectOneById(chartId);
-			// 解析出param
-			String config = mCharts.getConfig();
-			JSONObject object = JSON.parseObject(config);
-			String dataSetName = object.getString("dataSetName");
-			String dimension = object.getString("dimension").split(",")[0];
-			String measure = object.getString("measure").split(",")[0];
-			String legend = object.getString("color").split(",")[0];
-
-			RsColumnConf dimensionObj = rsColumnConfMapper.selectOneById(dimension);
-			RsColumnConf measureObj = rsColumnConfMapper.selectOneById(measure);
-			RsColumnConf legendObj = null;
-			if (null != legend && !"".equals(legend)) {
-				legendObj = rsColumnConfMapper.selectOneById(legend);
-			}
-
-			// where 条件
-			JSONObject jsonObj = JSON.parseObject(json);
-
-			// 拼接查询的sql
-			SqlUtils sqlUtils = new SqlUtils();
-			Map map = new HashMap();
-			String sql = sqlUtils.assemble(dataSetName, dimensionObj, measureObj, legendObj, jsonObj, map);
-			log.info("编辑chart sql: " + sql);
-			list = jdbcDao.query(sql, map);
-			if (list.size() > 10) {
-				list = list.subList(0, 10);
-			}
-			// 调用查询过程
-			rest.put("list", list);
-			rest.put("mCharts", mCharts);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return rest.toJSONString();
-	}
+	/************ 新版编辑图表的接口 ************/
 
 	/**
-	 * 请求 table明细的 数据
+	 * 新编辑后端，根据t_dashboard_id查询所有的mcharts
 	 * 
-	 * @param chartId
-	 * @param json
+	 * @param t_dashboard_id
+	 * 
+	 * @date 20190226
 	 * @return
 	 */
-	@RequestMapping(value = "/findTableDate", method = RequestMethod.POST)
-	public String findTableDate(String chartId, String json) {
-		JSONObject rest = new JSONObject();
-		List<Map<String, Object>> list = new ArrayList();
-		Map<String, Object> data = new HashMap<>();
-		List<String> headers = new ArrayList();
-		List body = new ArrayList();
-		data.put("header", headers);
-		data.put("body", body);
+	@RequestMapping(value = "/getMchartsList", method = RequestMethod.POST)
+	public Map<String, Object> getMchartsList(String t_dashboard_id) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Mcharts> chart_map = new HashMap<String, Mcharts>();
 		try {
-			// 根据 chartId 查询出表 m_charts表
-			Mcharts mCharts = mChartsMapper.selectOneById(chartId);
-			// 解析出param
-			String config = mCharts.getConfig();
-			JSONObject object = JSON.parseObject(config);
-			String column = object.getString("column");
-			String dataSetName = object.getString("dataSetName");
+			List<Mcharts> chartList = mChartsMapper.selectById(t_dashboard_id);
+			for (Mcharts mcharts : chartList) {
+				chart_map.put(mcharts.getId(), mcharts);
+			}
+			Tdashboard tDashboard = CacheUtil.tDashboard.get(t_dashboard_id);
+			Map<String, Object> idColumns = reportUtils.getColumnsByDateSet(tDashboard);
+			JSONObject style_config = JSON.parseObject(tDashboard.getStyle_config());
+			JSONArray dataSet = style_config.getJSONArray("dataSet");
+			Map<String, RsTableConf> dataSetList = new HashMap<String, RsTableConf>();
 			List<String> ids = new ArrayList<String>();
-			String[] array = column.split(",");
-			for (String id : array) {
-				if ("" != id) {
-					ids.add(id);
-				}
+			for (int i = 0; i < dataSet.size(); i++) {
+				ids.add(dataSet.getString(i));
 			}
-			List<RsColumnConf> rsColumnConfList = rsColumnConfMapper.selectByIds(ids);
-			// 拼接查询的sql
-			SqlUtils sqlUtils = new SqlUtils();
-			Map map = new HashMap();
-			String sql = sqlUtils.assemble(dataSetName, rsColumnConfList, map, headers);
-			log.info("编辑table sql: " + sql);
-			list = jdbcDao.query(sql, map);
-
-			List row;
-			if (list.size() > 0) {
-				Map<String, RsColumnConf> meaMap = new HashMap<>();
-				for (RsColumnConf rsColumnConf : rsColumnConfList) {
-					meaMap.put(rsColumnConf.getRsc_display(), rsColumnConf);
-				}
-				RsColumnConf rsColumnConf;
-				Object val;
-				for (Map<String, Object> m : list) {
-					row = new ArrayList();
-					for (String header : headers) {
-						// 判断是否是度量 and 数值类型
-						rsColumnConf = meaMap.get(header);
-						val = m.get(header);
-						if (val != null && rsColumnConf != null && rsColumnConf.getRsc_type() == 1) {
-							// 是否存在数值格式化公式
-							if (StringUtils.isNotEmpty(rsColumnConf.getRsc_formatter())) {
-								val = new DecimalFormat(rsColumnConf.getRsc_formatter()).format(val);
-							}
-						}
-						row.add(val);
-					}
-					body.add(row);
-				}
+			List<RsTableConf> rsTableConfList = rsTableConfMapper.selectByIds(ids);
+			for (RsTableConf table : rsTableConfList) {
+				dataSetList.put(table.getDs_name(), table);
 			}
-			rest.put("mCharts", mCharts);
-			rest.put("list", data);
+			map.put("idColumns", idColumns);
+			map.put("mChartsList", chart_map);
+			map.put("tDashboard", tDashboard);
+			map.put("dataSetList", dataSetList);
 		} catch (Exception e) {
-			rest.put("result", "error");
-			rest.put("list", data);
 			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
-
-		return rest.toJSONString();
+		return map;
+	}
+	
+	/**
+	 * 新版-新建图表
+	 * 
+	 * @param id
+	 * @param config
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/newCharts", method = RequestMethod.POST)
+	public Map<String, Object> newCharts(String id, String config) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			/***
+			 * 报表Id+config组成MD5id
+			 ***/
+			String mchart_id = MD5Uitls.getMD5Id(id + config); // 根据config生成mcharts的唯一键
+			Mcharts mcharts_old = mChartsMapper.selectOneById(mchart_id); // 根据md5id查询
+			if (null != mcharts_old) {
+				map.put("success", "false");
+				return map;
+			}
+			// 获取去chart表的 name
+			JSONObject object = JSON.parseObject(config);
+			String name = object.getString("name");
+			String type = object.getString("type");
+			Mcharts mcharts = new Mcharts();
+			mcharts.setId(mchart_id);
+			mcharts.setDashboard_id(id);
+			mcharts.setName(name);
+			mcharts.setMc_type(Integer.parseInt(type));
+			mcharts.setConfig(config);
+			mcharts.setIs_active("Y"); // 一开始设置为N等第一次保存的时候改为Y
+			mChartsMapper.newChartByBean(mcharts);
+			// 刷新缓存
+			cacheUtil.refreshMChartsOne(mchart_id);
+			map.put("success", "success");
+		} catch (Exception e) {
+			map.put("success", "false");
+			e.printStackTrace();
+			log.error(e.getMessage(), e);
+		}
+		return map;
 	}
 
 }

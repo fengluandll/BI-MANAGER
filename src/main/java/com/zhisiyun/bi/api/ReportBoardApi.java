@@ -35,12 +35,10 @@ import com.zhisiyun.bi.defaultDao.RsReportMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.defaultDao.TdashboardMapper;
 import com.zhisiyun.bi.serviceImp.LogDebugImp;
-import com.zhisiyun.bi.serviceImp.ReportBoardImp;
 import com.zhisiyun.bi.serviceImp.ReportBoardImpPro;
 import com.zhisiyun.bi.utils.CacheUtil;
 import com.zhisiyun.bi.utils.ExcelUtils;
 import com.zhisiyun.bi.utils.MD5Uitls;
-import com.zhisiyun.bi.utils.MchartsUtils;
 import com.zhisiyun.bi.utils.ReportUtils;
 
 @RestController
@@ -65,9 +63,6 @@ public class ReportBoardApi {
 	private PrivilegeEditMapper privilegeEditMapper;
 
 	@Autowired
-	ReportBoardImp reportBoardImp;
-
-	@Autowired
 	ReportBoardImpPro reportBoardImpPro;
 
 	@Autowired
@@ -75,9 +70,6 @@ public class ReportBoardApi {
 
 	@Autowired
 	CacheUtil cacheUtil;
-
-	@Autowired
-	MchartsUtils mchartsUtils;
 
 	@Autowired
 	LogDebugImp logDebugImp;

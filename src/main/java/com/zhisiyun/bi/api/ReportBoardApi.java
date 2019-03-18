@@ -153,8 +153,8 @@ public class ReportBoardApi {
 	 * @return
 	 */
 	@RequestMapping(value = "/fetch", method = RequestMethod.POST)
-	public String fetch(String boardId) {
-		JSONObject rest = new JSONObject();
+	public Map<String, Object> fetch(String boardId) {
+		Map<String, Object> map = new HashMap<String, Object>();
 		Tdashboard tdashboardAll = null; // 全局Tdashboard用来给idColumns查询用的 add by wangliu 20190111
 		try {
 			// 插入日志
@@ -188,7 +188,7 @@ public class ReportBoardApi {
 					// 如果m_dashboard表里还没有数据就要从t_dashboard里copy
 					mDashboard = new Mdashboard();
 					mDashboard.setName(tDashboard.getName());
-					mDashboard.setStyle_config(tDashboard.getStyle_config());
+					mDashboard.setStyle_config("{}"); // 20190314最新版新建的m_dashboard不从t_dashboard中拷贝json,在前端拼接好json再提交上来就有了json
 					mDashboard.setTemplate_id(templateId);
 					mDashboard.setGroup_id(client);
 					mDashboard.setId(MD5Uitls.getMD5Id(templateId + client)); // 设置唯一键 template_id+group_id
@@ -198,29 +198,30 @@ public class ReportBoardApi {
 					// 重新取出
 					mDashboard = CacheUtil.mDashboard.get(templateId + client);
 				}
-				rest.put("mDashboard", mDashboard);
-				rest.put("tDashboard", tDashboard);
+				map.put("mDashboard", mDashboard);
+				map.put("tDashboard", tDashboard);
 				tdashboardAll = tDashboard;
 			} else {
 				// 自己
 				Tdashboard tDashboard = CacheUtil.tDashboard.get(rsReport.getPage_id());
-				rest.put("mDashboard", tDashboard);
+				map.put("mDashboard", tDashboard);
+				map.put("tDashboard", tDashboard);
 				tdashboardAll = tDashboard;
 			}
 			List<Mcharts> mCharts = CacheUtil.mCharts.get(templateId);
 			// 查询每个图表所拥有的 维度 度量图例 和 搜索框的 子组件 所在 字段 的对应的表数据
 			Map<String, Object> idColumns = reportUtils.getColumnsByDateSet(tdashboardAll);
-			rest.put("mCharts", mCharts);
-			rest.put("idColumns", idColumns);
-			rest.put("user_type", user_type);
-			rest.put("user_auth", user_auth);
-			rest.put("success", "success");
+			map.put("mCharts", mCharts);
+			map.put("idColumns", idColumns);
+			map.put("user_type", user_type);
+			map.put("user_auth", user_auth);
+			map.put("success", "success");
 		} catch (Exception e) {
-			rest.put("success", "false");
+			map.put("success", "false");
 			e.printStackTrace();
 			log.error(e.getMessage(), e);
 		}
-		return rest.toJSONString();
+		return map;
 	}
 
 	@RequestMapping(value = "/fetchEdit", method = RequestMethod.POST)

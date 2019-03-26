@@ -232,7 +232,8 @@ public class ReportBoardApi {
 			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
 			List<Mcharts> mCharts = CacheUtil.mCharts.get(rsReport.getPage_id());
 			// 查询每个图表 所拥有的 数据集 的 所有字段 的表数据
-			JSONObject tableIdColumns = new JSONObject();
+			Map<String, List<RsColumnConf>> tableIdColumns = new HashMap<String, List<RsColumnConf>>();
+			Map<String,RsTableConf> tableConfig = new HashMap<String,RsTableConf>();
 			List<String> dataSetNameList = new ArrayList<String>(); // 数据集名称List
 			for (Mcharts mchart : mCharts) { // 循环是所有的图表找到他们的 数据集
 				String config = mchart.getConfig();
@@ -249,10 +250,12 @@ public class ReportBoardApi {
 					RsTableConf rsTableConf = rsTableConfMapper.selectByName(dataSetName).get(0);
 					List<RsColumnConf> tableIdColumn = rsColumnConfMapper.selectByTableId(rsTableConf.getId());
 					tableIdColumns.put(dataSetName, tableIdColumn);
+					tableConfig.put(dataSetName, rsTableConf);
 				}
 			}
 
 			map.put("tableIdColumns", tableIdColumns);
+			map.put("tableConfig", tableConfig); // key:数据集名称,value:table对象
 			map.put("success", "success");
 		} catch (Exception e) {
 			map.put("success", "false");

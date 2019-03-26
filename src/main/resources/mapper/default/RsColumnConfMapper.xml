@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zhisiyun.bi.defaultDao.RsColumnConfMapper">
 	<resultMap id="BaseResultMap" type="com.zhisiyun.bi.bean.defaultBean.RsColumnConf">
-	    <id column="sn_id" jdbcType="INTEGER" property="sn_id" />
+		<id column="sn_id" jdbcType="INTEGER" property="sn_id" />
 		<result column="id" jdbcType="VARCHAR" property="id" />
 		<result column="rs_t_id" jdbcType="INTEGER" property="rs_t_id" />
 		<result column="is_calc" jdbcType="VARCHAR" property="is_calc" />
@@ -14,9 +14,37 @@
 		<result column="rsc_type" jdbcType="INTEGER" property="rsc_type" />
 		<result column="rsc_sort" jdbcType="INTEGER" property="rsc_sort" />
 		<result column="rsc_remark" jdbcType="VARCHAR" property="rsc_remark" />
-        <result column="is_active" jdbcType="VARCHAR" property="is_active" />
-        <result column="create_date" jdbcType="DATE" property="create_date" />
+		<result column="is_active" jdbcType="VARCHAR" property="is_active" />
+		<result column="create_date" jdbcType="DATE" property="create_date" />
 		<result column="modify_date" jdbcType="DATE" property="modify_date" />
+	</resultMap>
+
+	<resultMap id="BaseResultMap2" type="com.zhisiyun.bi.bean.defaultBean.RsColumnConf">
+		<id column="sn_id" jdbcType="INTEGER" property="sn_id" />
+		<result column="id" jdbcType="VARCHAR" property="id" />
+		<result column="rs_t_id" jdbcType="INTEGER" property="rs_t_id" />
+		<result column="is_calc" jdbcType="VARCHAR" property="is_calc" />
+		<result column="rsc_display" jdbcType="VARCHAR" property="rsc_display" />
+		<result column="rsc_formatter" jdbcType="VARCHAR" property="rsc_formatter" />
+		<result column="rsc_id" jdbcType="VARCHAR" property="rsc_id" />
+		<result column="rsc_name" jdbcType="VARCHAR" property="rsc_name" />
+		<result column="rsc_array" jdbcType="VARCHAR" property="rsc_array" />
+		<result column="rsc_type" jdbcType="INTEGER" property="rsc_type" />
+		<result column="rsc_sort" jdbcType="INTEGER" property="rsc_sort" />
+		<result column="rsc_remark" jdbcType="VARCHAR" property="rsc_remark" />
+		<result column="is_active" jdbcType="VARCHAR" property="is_active" />
+		<result column="create_date" jdbcType="DATE" property="create_date" />
+		<result column="modify_date" jdbcType="DATE" property="modify_date" />
+		<association property="rsTableConf" javaType="com.zhisiyun.bi.bean.defaultBean.RsTableConf">
+			<id column="sn_id" jdbcType="INTEGER" property="sn_id" />
+			<result column="id" jdbcType="VARCHAR" property="id" />
+			<result column="ds_name" jdbcType="VARCHAR" property="ds_name" />
+			<result column="ds_display" jdbcType="VARCHAR" property="ds_display" />
+			<result column="ds_type" jdbcType="INTEGER" property="ds_type" />
+			<result column="logic" jdbcType="VARCHAR" property="logic" />
+			<result column="create_date" jdbcType="DATE" property="create_date" />
+			<result column="modify_date" jdbcType="DATE" property="modify_date" />
+		</association>
 	</resultMap>
 
 	<select id="selectAll" resultMap="BaseResultMap">
@@ -50,7 +78,7 @@
 		rs_t_id = #{rs_t_id}
 		order by sn_id
 	</select>
-	
+
 	<select id="selectIdsByTableIds" resultType="String">
 		select id from
 		rs_column_conf where
@@ -69,15 +97,15 @@
 		order by sn_id
 	</select>
 
-	<select id="selectByIds" resultMap="BaseResultMap">
+	<select id="selectByIds" resultMap="BaseResultMap2">
 		select * from
-		rs_column_conf where
-		id in
+		rs_column_conf c left join rs_table_conf t on c.rs_t_id = t.id
+		where c.id in
 		<foreach collection="ids" index="index" item="item" open="("
 			separator="," close=")">
 			#{item}
 		</foreach>
-		order by sn_id
+		order by c.sn_id
 	</select>
 
 	<insert id="addByBean" parameterType="com.zhisiyun.bi.bean.defaultBean.RsColumnConf"

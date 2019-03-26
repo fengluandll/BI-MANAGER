@@ -33,7 +33,8 @@ public class RsColumnConf implements Serializable {
 	 * num_c:计算度量（可以聚合） str:属性（只能用来显示，不能用来分析） dim是维度，可用来筛选关联。 num是度量，可用来计算。
 	 * str是属性，只能用来显示。"
 	 ***/
-	private Integer rsc_type; // 字段类型 1时间类型2组织类型3普通类型4布尔类型   ; 11:num_n普通度量类型12num_c计算度量类型 21:str属性只能用来显示不能用来关联查询
+	private Integer rsc_type; // 字段类型 1时间类型2组织类型3普通类型4布尔类型 ; 11:num_n普通度量类型12num_c计算度量类型
+								// 21:str属性只能用来显示不能用来关联查询
 
 	private Integer rsc_sort; // 排序
 
@@ -44,6 +45,8 @@ public class RsColumnConf implements Serializable {
 	private Date create_date;
 
 	private Date modify_date;
+
+	private RsTableConf rsTableConf; // 关联table表
 
 	public Integer getSn_id() {
 		return sn_id;
@@ -164,4 +167,13 @@ public class RsColumnConf implements Serializable {
 	public void setModify_date(Date modify_date) {
 		this.modify_date = modify_date;
 	}
+
+	public RsTableConf getRsTableConf() {
+		return rsTableConf;
+	}
+
+	public void setRsTableConf(RsTableConf rsTableConf) {
+		this.rsTableConf = rsTableConf;
+	}
+
 }

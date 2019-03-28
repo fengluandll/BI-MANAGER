@@ -175,6 +175,8 @@ public class EditChartsApi {
 						name = "新建" + id + "perspective" + type;
 					} else if (type.equals("6")) {
 						name = "新建" + id + "text" + type;
+					} else if (type.equals("61")) {
+						name = "新建" + id + "textStandard" + type;
 					} else if (type.equals("21")) {
 						name = "新建" + id + "antdtable" + type;
 					} else if (type.equals("22")) {
@@ -373,8 +375,8 @@ public class EditChartsApi {
 			Map<String, Object> idColumns = reportUtils.getColumnsByDateSet(tDashboard);
 			JSONObject style_config = JSON.parseObject(tDashboard.getStyle_config());
 			JSONArray dataSet = style_config.getJSONArray("dataSet");
-			Map<String, RsTableConf> dataSetList = new HashMap<String, RsTableConf>(); //数据集map
-			Map<String, List<RsColumnConf>> tableIdColumns = new HashMap<String,  List<RsColumnConf>>(); //数据集 字段Map
+			Map<String, RsTableConf> dataSetList = new HashMap<String, RsTableConf>(); // 数据集map
+			Map<String, List<RsColumnConf>> tableIdColumns = new HashMap<String, List<RsColumnConf>>(); // 数据集 字段Map
 			List<String> ids = new ArrayList<String>();
 			for (int i = 0; i < dataSet.size(); i++) {
 				ids.add(dataSet.getString(i));
@@ -385,7 +387,7 @@ public class EditChartsApi {
 				List<RsColumnConf> tableIdColumn = rsColumnConfMapper.selectByTableId(table.getId());
 				tableIdColumns.put(table.getDs_name(), tableIdColumn); // 放入tableIdColumns
 			}
-			map.put("idColumns", idColumns); //所有数据集有的字段 column表数据
+			map.put("idColumns", idColumns); // 所有数据集有的字段 column表数据
 			map.put("mChartsList", chart_map); // 所有的图表
 			map.put("tDashboard", tDashboard);
 			map.put("dataSetList", dataSetList); // 数据集
@@ -396,7 +398,7 @@ public class EditChartsApi {
 		}
 		return map;
 	}
-	
+
 	/**
 	 * 新版-新建图表
 	 * 

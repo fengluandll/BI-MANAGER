@@ -26,4 +26,12 @@ public class JdbcDao {
 		return namedParameterJdbcTemplate.queryForList(sql, params);
 	}
 
+	/***
+	 * count 查询
+	 * 
+	 * ***/
+	public Integer queryCount(String sql) {
+		return jdbcTemplate.queryForObject(sql, Integer.class);
+	}
+
 }

@@ -377,6 +377,7 @@ public class EditChartsApi {
 			JSONArray dataSet = style_config.getJSONArray("dataSet");
 			Map<String, RsTableConf> dataSetList = new HashMap<String, RsTableConf>(); // 数据集map
 			Map<String, List<RsColumnConf>> tableIdColumns = new HashMap<String, List<RsColumnConf>>(); // 数据集 字段Map
+			Map<String,RsTableConf> tableConfig = new HashMap<String,RsTableConf>();
 			List<String> ids = new ArrayList<String>();
 			for (int i = 0; i < dataSet.size(); i++) {
 				ids.add(dataSet.getString(i));
@@ -386,12 +387,14 @@ public class EditChartsApi {
 				dataSetList.put(table.getDs_name(), table);
 				List<RsColumnConf> tableIdColumn = rsColumnConfMapper.selectByTableId(table.getId());
 				tableIdColumns.put(table.getDs_name(), tableIdColumn); // 放入tableIdColumns
+				tableConfig.put(table.getDs_name(), table);
 			}
 			map.put("idColumns", idColumns); // 所有数据集有的字段 column表数据
 			map.put("mChartsList", chart_map); // 所有的图表
 			map.put("tDashboard", tDashboard);
 			map.put("dataSetList", dataSetList); // 数据集
-			map.put("tableIdColumns", tableIdColumns); // 数据集名称为key,
+			map.put("tableIdColumns", tableIdColumns); // 数据集名称为key,所有数据集字段为value
+			map.put("tableConfig", tableConfig); // 数据集名称为key,table为value
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error(e.getMessage(), e);

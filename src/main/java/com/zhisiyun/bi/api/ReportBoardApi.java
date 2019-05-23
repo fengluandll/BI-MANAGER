@@ -34,6 +34,7 @@ import com.zhisiyun.bi.defaultDao.RsColumnConfMapper;
 import com.zhisiyun.bi.defaultDao.RsReportMapper;
 import com.zhisiyun.bi.defaultDao.RsTableConfMapper;
 import com.zhisiyun.bi.defaultDao.TdashboardMapper;
+import com.zhisiyun.bi.dsDao.ReportMapper;
 import com.zhisiyun.bi.serviceImp.LogDebugImp;
 import com.zhisiyun.bi.serviceImp.ReportBoardImpPro;
 import com.zhisiyun.bi.utils.CacheUtil;
@@ -67,6 +68,9 @@ public class ReportBoardApi {
 
 	@Autowired
 	RsReportMapper rsReportMapper;
+
+	@Autowired
+	ReportMapper reportMapper;
 
 	@Autowired
 	CacheUtil cacheUtil;
@@ -233,7 +237,7 @@ public class ReportBoardApi {
 			List<Mcharts> mCharts = CacheUtil.mCharts.get(rsReport.getPage_id());
 			// 查询每个图表 所拥有的 数据集 的 所有字段 的表数据
 			Map<String, List<RsColumnConf>> tableIdColumns = new HashMap<String, List<RsColumnConf>>();
-			Map<String,RsTableConf> tableConfig = new HashMap<String,RsTableConf>();
+			Map<String, RsTableConf> tableConfig = new HashMap<String, RsTableConf>();
 			List<String> dataSetNameList = new ArrayList<String>(); // 数据集名称List
 			for (Mcharts mchart : mCharts) { // 循环是所有的图表找到他们的 数据集
 				String config = mchart.getConfig();
@@ -382,6 +386,32 @@ public class ReportBoardApi {
 			RsReport rsReport = rsReportMapper.selectByReportId(boardId);
 			dataList = reportBoardImpPro.searchItemData(id, rsReport);
 			map.put(id, dataList);
+		} catch (Exception e) {
+			map.put("success", "false");
+			e.printStackTrace();
+			log.error(e.getMessage(), e);
+		}
+		return map;
+	}
+
+	/**
+	 * @title:组织树查询
+	 * 
+	 * @param:( id:reportId )
+	 * 
+	 * 
+	 * 
+	 */
+	@RequestMapping(value = "/getSearchData", method = RequestMethod.POST)
+	public Map<String, Object> getSearchData(@RequestParam(value = "id", required = true) String id) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			RsReport rsReport = rsReportMapper.selectByReportId(id);
+			JSONObject params = JSON.parseObject(rsReport.getParams());
+			String people = params.getString("PEOPLE");
+			people = "5b70dfd1e54a02b56363e56e";
+			String data = reportMapper.getSearchData(people);
+			map.put("data", data);
 		} catch (Exception e) {
 			map.put("success", "false");
 			e.printStackTrace();

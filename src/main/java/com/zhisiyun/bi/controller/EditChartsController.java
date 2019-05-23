@@ -106,7 +106,9 @@ public class EditChartsController {
 		 * 
 		 * ***/
 		String type = obj.getString("type");
-		if ("0".equals(type) || "1".equals(type) || "2".equals(type)) {
+		if ("0".equals(type) || "1".equals(type) || "2".equals(type) || "31".equals(type) || "32".equals(type)
+				|| "33".equals(type) || "34".equals(type) || "35".equals(type) || "36".equals(type)
+				|| "37".equals(type)) {
 			view.setViewName("mCharts/editCharts");
 		}
 		if ("3".equals(type) || "5".equals(type) || "7".equals(type)) {
@@ -124,10 +126,10 @@ public class EditChartsController {
 		if ("61".equals(type)) {
 			view.setViewName("mCharts/editTextStandard");
 		}
-		if("21".equals(type)) {
+		if ("21".equals(type)) {
 			view.setViewName("mCharts/editAntdTable");
 		}
-		if("22".equals(type)) {
+		if ("22".equals(type)) {
 			view.setViewName("mCharts/editPivotDiy");
 		}
 		return view;
@@ -148,14 +150,14 @@ public class EditChartsController {
 			List<String> type_ids = new ArrayList<String>();// 维度度量类型
 			// 获取 rs_t_id
 			RsTableConf rsTableConf = rsTableConfMapper.selectByName(ds_name).get(0);
-			// 维度 
+			// 维度
 			type_ids.add("1");
 			type_ids.add("2");
 			type_ids.add("3");
 			type_ids.add("4");
 			type_ids.add("21");
 			List<RsColumnConf> dimension = rsColumnConfMapper.selectByTableIdAndType(rsTableConf.getId(), type_ids);
-			// 度量 
+			// 度量
 			type_ids = new ArrayList<String>();
 			type_ids.add("11");
 			type_ids.add("12");
@@ -192,7 +194,7 @@ public class EditChartsController {
 		}
 		return view;
 	}
-	
+
 	/**
 	 * @see 编辑table的 排序字段
 	 * @author wangliu
@@ -215,7 +217,7 @@ public class EditChartsController {
 		}
 		return view;
 	}
-	
+
 	/**
 	 * @see 编辑table的 列
 	 * @author wangliu
@@ -239,7 +241,7 @@ public class EditChartsController {
 		}
 		return view;
 	}
-	
+
 	/**
 	 * @see 编辑table的 列
 	 * @author wangliu

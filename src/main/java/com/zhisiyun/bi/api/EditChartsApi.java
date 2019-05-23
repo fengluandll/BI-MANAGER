@@ -183,6 +183,12 @@ public class EditChartsApi {
 						name = "新建" + id + "pivotDiy" + type;
 					} else if (type.equals("11")) {
 						name = "新建" + id + "Search" + type;
+					} else if (type.equals("31")) {
+						name = "新建" + id + "circular" + type;
+					} else if (type.equals("32")) {
+						name = "新建" + id + "dashboard" + type;
+					} else if (type.equals("33")) {
+						name = "新建" + id + "barrow" + type;
 					}
 				} else {
 					name = "新建" + id + "组件";
@@ -377,7 +383,7 @@ public class EditChartsApi {
 			JSONArray dataSet = style_config.getJSONArray("dataSet");
 			Map<String, RsTableConf> dataSetList = new HashMap<String, RsTableConf>(); // 数据集map
 			Map<String, List<RsColumnConf>> tableIdColumns = new HashMap<String, List<RsColumnConf>>(); // 数据集 字段Map
-			Map<String,RsTableConf> tableConfig = new HashMap<String,RsTableConf>();
+			Map<String, RsTableConf> tableConfig = new HashMap<String, RsTableConf>();
 			List<String> ids = new ArrayList<String>();
 			for (int i = 0; i < dataSet.size(); i++) {
 				ids.add(dataSet.getString(i));
